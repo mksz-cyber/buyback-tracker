@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tencent & Prosus Buyback Tracker</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card-bg: #1a1d27;
+    --card-border: #2a2d3a;
+    --text: #e4e6ef;
+    --text-muted: #8b8fa3;
+    --accent-blue: #4f8ff7;
+    --accent-green: #34d399;
+    --accent-red: #f87171;
+    --accent-orange: #fb923c;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .header {
+    background: linear-gradient(135deg, #1a1d27 0%, #0f1117 100%);
+    border-bottom: 1px solid var(--card-border);
+    padding: 20px 32px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #4f8ff7 0%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header .subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .update-badge {
+    background: rgba(52, 211, 153, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    color: var(--accent-green);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 32px 48px;
+  }
+
+  /* CSS-only page switching with radio buttons */
+  .tab-radio { display: none; }
+  .page-nav {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+    padding: 4px;
+    background: rgba(42, 45, 58, 0.5);
+    border-radius: 10px;
+    width: fit-content;
+  }
+  .tab-label {
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    font-weight: 500;
+    user-select: none;
+  }
+  .tab-label:hover {
+    background: rgba(79, 143, 247, 0.1);
+    color: var(--text);
+  }
+  .page { display: none; }
+
+  /* When tab0 checked → show page0, activate label0 */
+  #tab0:checked ~ .page-nav label[for="tab0"],
+  #tab1:checked ~ .page-nav label[for="tab1"],
+  #tab2:checked ~ .page-nav label[for="tab2"] {
+    background: var(--accent-blue);
+    color: white;
+  }
+  #tab0:checked ~ .pages .page0,
+  #tab1:checked ~ .pages .page1,
+  #tab2:checked ~ .pages .page2 {
+    display: block;
+  }
+
+  /* KPI Cards */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .kpi-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+  .kpi-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .kpi-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .negative { color: var(--accent-red); }
+  .positive { color: var(--accent-green); }
+  .blue { color: var(--accent-blue); }
+  .orange { color: var(--accent-orange); }
+
+  /* Section */
+  .section {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .chart-container {
+    position: relative;
+    height: 380px;
+  }
+
+  /* Tables */
+  .table-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .table-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--card-border);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  th {
+    text-align: left;
+    padding: 10px 14px;
+    background: rgba(79, 143, 247, 0.05);
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--card-border);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(42, 45, 58, 0.5);
+  }
+  tr:hover td {
+    background: rgba(79, 143, 247, 0.03);
+  }
+  .scroll-table {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .scroll-table::-webkit-scrollbar { width: 6px; }
+  .scroll-table::-webkit-scrollbar-track { background: transparent; }
+  .scroll-table::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 3px; }
+
+  .footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-muted);
+    font-size: 11px;
+    border-top: 1px solid var(--card-border);
+    margin-top: 32px;
+  }
+  @media (max-width: 768px) {
+    .container { padding: 16px; }
+    .kpi-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <h1>Tencent & Prosus Buyback Tracker</h1>
+      <div class="subtitle">Daily Summary Dashboard | Updated: 2026-06-11</div>
+    </div>
+    <div class="update-badge">Live</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- CSS-only tab switching (no JavaScript) -->
+  <input type="radio" name="tab" id="tab0" class="tab-radio" checked>
+  <input type="radio" name="tab" id="tab1" class="tab-radio">
+  <input type="radio" name="tab" id="tab2" class="tab-radio">
+
+  <div class="page-nav">
+    <label for="tab0" class="tab-label">Summary</label>
+    <label for="tab1" class="tab-label">Tencent Details</label>
+    <label for="tab2" class="tab-label">Prosus Details</label>
+  </div>
+
+  <div class="pages">
+
+  <!-- ========== PAGE 1: SUMMARY ========== -->
+  <div class="page page0">
+
+    <!-- KPI 1: Last Trading Day BB -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Tencent Last Buyback (2026-06-11)</div>
+        <div class="kpi-value blue">HKD 500.6 mn</div>
+        <div class="kpi-sub">USD 63.9 mn</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Tencent 2026 YTD Avg Daily Run Rate</div>
+        <div class="kpi-value negative">HKD 511.1 mn/day</div>
+        <div class="kpi-sub">36 BB days | -24.8% vs 2025 same period (42 days)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Implied 2026 Total Buyback</div>
+        <div class="kpi-value negative">HKD 66.4 bn</div>
+        <div class="kpi-sub">-15.4% vs 2025 actual (based on 130 BB days)</div>
+      </div>
+    </div>
+
+    <!-- Yearly Comparison Bar Chart -->
+    <div class="section">
+      <div class="section-title">Tencent vs Prosus Annual Buyback</div>
+      <div class="chart-container" style="height:400px;">
+        <svg viewBox="0 0 1100 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+  <!-- Y-axis grid -->
+  <line x1="70" y1="370.0" x2="1070" y2="370.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="370.0" text-anchor="end" fill="#8b8fa3" font-size="11" dominant-baseline="middle">0</text><line x1="70" y1="310.0" x2="1070" y2="310.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="310.0" text-anchor="end" fill="#8b8fa3" font-size="11" dominant-baseline="middle">4</text><line x1="70" y1="250.0" x2="1070" y2="250.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="250.0" text-anchor="end" fill="#8b8fa3" font-size="11" dominant-baseline="middle">8</text><line x1="70" y1="190.0" x2="1070" y2="190.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="190.0" text-anchor="end" fill="#8b8fa3" font-size="11" dominant-baseline="middle">12</text><line x1="70" y1="130.0" x2="1070" y2="130.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="130.0" text-anchor="end" fill="#8b8fa3" font-size="11" dominant-baseline="middle">16</text><line x1="70" y1="70.0" x2="1070" y2="70.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="70.0" text-anchor="end" fill="#8b8fa3" font-size="11" dominant-baseline="middle">20</text>
+
+  <!-- X-axis line -->
+  <line x1="70" y1="370" x2="1070" y2="370" stroke="#2a2d3a" stroke-width="0.5"/>
+
+  <!-- Bars -->
+  <rect x="111.0" y="317.6" width="52" height="52.4" rx="3" ry="3" fill="#4f8ff7"/><rect x="177.0" y="273.0" width="52" height="97.0" rx="3" ry="3" fill="#fb923c"/><rect x="311.0" y="274.3" width="52" height="95.7" rx="3" ry="3" fill="#4f8ff7"/><rect x="377.0" y="234.5" width="52" height="135.5" rx="3" ry="3" fill="#fb923c"/><rect x="511.0" y="152.6" width="52" height="217.4" rx="3" ry="3" fill="#4f8ff7"/><rect x="577.0" y="264.3" width="52" height="105.7" rx="3" ry="3" fill="#fb923c"/><rect x="711.0" y="217.6" width="52" height="152.4" rx="3" ry="3" fill="#4f8ff7"/><rect x="777.0" y="235.1" width="52" height="134.9" rx="3" ry="3" fill="#fb923c"/><rect x="911.0" y="338.2" width="52" height="31.8" rx="3" ry="3" fill="#4f8ff7"/><rect x="977.0" y="332.6" width="52" height="37.4" rx="3" ry="3" fill="#fb923c"/>
+
+  <!-- Value labels -->
+  <text x="137.0" y="311.6" text-anchor="middle" fill="#e4e6ef" font-size="11" font-weight="600">3.5</text><text x="203.0" y="267.0" text-anchor="middle" fill="#e4e6ef" font-size="11" font-weight="600">6.4</text><text x="337.0" y="268.3" text-anchor="middle" fill="#e4e6ef" font-size="11" font-weight="600">6.3</text><text x="403.0" y="228.5" text-anchor="middle" fill="#e4e6ef" font-size="11" font-weight="600">8.9</text><text x="537.0" y="146.6" text-anchor="middle" fill="#e4e6ef" font-size="11" font-weight="600">14.4</text><text x="603.0" y="258.3" text-anchor="middle" fill="#e4e6ef" font-size="11" font-weight="600">7.0</text><text x="737.0" y="211.6" text-anchor="middle" fill="#e4e6ef" font-size="11" font-weight="600">10.1</text><text x="803.0" y="229.1" text-anchor="middle" fill="#e4e6ef" font-size="11" font-weight="600">8.9</text><text x="937.0" y="332.2" text-anchor="middle" fill="#e4e6ef" font-size="11" font-weight="600">2.1</text><text x="1003.0" y="326.6" text-anchor="middle" fill="#e4e6ef" font-size="11" font-weight="600">2.5</text>
+
+  <!-- Percentage labels -->
+  <text x="170.0" y="247.0" text-anchor="middle" fill="#f87171" font-size="13" font-weight="700">-46.0%</text><text x="370.0" y="208.5" text-anchor="middle" fill="#f87171" font-size="13" font-weight="700">-29.4%</text><text x="570.0" y="126.6" text-anchor="middle" fill="#34d399" font-size="13" font-weight="700">+105.9%</text><text x="770.0" y="191.6" text-anchor="middle" fill="#34d399" font-size="13" font-weight="700">+13.0%</text><text x="970.0" y="306.6" text-anchor="middle" fill="#f87171" font-size="13" font-weight="700">-15.1%</text>
+
+  <!-- X-axis year labels -->
+  <text x="170.0" y="390" text-anchor="middle" fill="#8b8fa3" font-size="12" font-weight="500">2022</text><text x="370.0" y="390" text-anchor="middle" fill="#8b8fa3" font-size="12" font-weight="500">2023</text><text x="570.0" y="390" text-anchor="middle" fill="#8b8fa3" font-size="12" font-weight="500">2024</text><text x="770.0" y="390" text-anchor="middle" fill="#8b8fa3" font-size="12" font-weight="500">2025</text><text x="970.0" y="390" text-anchor="middle" fill="#8b8fa3" font-size="12" font-weight="500">2026 YTD</text>
+
+  <!-- Y-axis title -->
+  <text x="18" y="210.0" text-anchor="middle" fill="#8b8fa3" font-size="10" transform="rotate(-90 18 210.0)">Buyback (USD bn)</text>
+
+  <!-- Legend -->
+  <rect x="70" y="10" width="12" height="12" rx="2" fill="#4f8ff7"/>
+  <text x="88" y="20" fill="#e4e6ef" font-size="11" font-weight="500">Tencent</text>
+  <rect x="170" y="10" width="12" height="12" rx="2" fill="#fb923c"/>
+  <text x="188" y="20" fill="#e4e6ef" font-size="11" font-weight="500">Prosus</text>
+</svg>
+      </div>
+    </div>
+
+    <!-- KPI: Since Jun-28-2022 Cumulative -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Tencent Cumulative (Jun 28, 2022 - Jun 5, 2026)</div>
+        <div class="kpi-value blue">USD 36.3 bn</div>
+        <div class="kpi-sub">36310 mn</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Prosus Cumulative (Jun 28, 2022 - Jun 5, 2026)</div>
+        <div class="kpi-value orange">USD 33.7 bn</div>
+        <div class="kpi-sub">33720 mn</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Difference (Tencent vs Prosus)</div>
+        <div class="kpi-value positive">+7.7%</div>
+        <div class="kpi-sub">Tencent relative to Prosus</div>
+      </div>
+    </div>
+
+    <!-- Cumulative Chart -->
+    <div class="section">
+      <div class="section-title">Tencent vs Prosus (Jun 28, 2022 - Jun 5, 2026)</div>
+      <div class="chart-container">
+        <svg viewBox="0 0 1100 360" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+  <defs>
+    <linearGradient id="tGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4f8ff7" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#4f8ff7" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="pGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fb923c" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#fb923c" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Y-axis -->
+  <line x1="70" y1="310.0" x2="1070" y2="310.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="310.0" text-anchor="end" fill="#8b8fa3" font-size="11" dominant-baseline="middle">0</text><line x1="70" y1="254.0" x2="1070" y2="254.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="254.0" text-anchor="end" fill="#8b8fa3" font-size="11" dominant-baseline="middle">8</text><line x1="70" y1="198.0" x2="1070" y2="198.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="198.0" text-anchor="end" fill="#8b8fa3" font-size="11" dominant-baseline="middle">16</text><line x1="70" y1="142.0" x2="1070" y2="142.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="142.0" text-anchor="end" fill="#8b8fa3" font-size="11" dominant-baseline="middle">24</text><line x1="70" y1="86.0" x2="1070" y2="86.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="86.0" text-anchor="end" fill="#8b8fa3" font-size="11" dominant-baseline="middle">31</text><line x1="70" y1="30.0" x2="1070" y2="30.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="30.0" text-anchor="end" fill="#8b8fa3" font-size="11" dominant-baseline="middle">39</text>
+
+  <!-- X-axis -->
+  <text x="70.0" y="330" text-anchor="middle" fill="#8b8fa3" font-size="10">Jun 22</text><line x1="70.0" y1="30" x2="70.0" y2="310" stroke="#2a2d3a" stroke-width="0.3" stroke-dasharray="4,4"/><text x="176.8" y="330" text-anchor="middle" fill="#8b8fa3" font-size="10">Nov 22</text><line x1="176.8" y1="30" x2="176.8" y2="310" stroke="#2a2d3a" stroke-width="0.3" stroke-dasharray="4,4"/><text x="283.6" y="330" text-anchor="middle" fill="#8b8fa3" font-size="10">May 23</text><line x1="283.6" y1="30" x2="283.6" y2="310" stroke="#2a2d3a" stroke-width="0.3" stroke-dasharray="4,4"/><text x="390.4" y="330" text-anchor="middle" fill="#8b8fa3" font-size="10">Oct 23</text><line x1="390.4" y1="30" x2="390.4" y2="310" stroke="#2a2d3a" stroke-width="0.3" stroke-dasharray="4,4"/><text x="497.2" y="330" text-anchor="middle" fill="#8b8fa3" font-size="10">Mar 24</text><line x1="497.2" y1="30" x2="497.2" y2="310" stroke="#2a2d3a" stroke-width="0.3" stroke-dasharray="4,4"/><text x="604.0" y="330" text-anchor="middle" fill="#8b8fa3" font-size="10">Aug 24</text><line x1="604.0" y1="30" x2="604.0" y2="310" stroke="#2a2d3a" stroke-width="0.3" stroke-dasharray="4,4"/><text x="710.8" y="330" text-anchor="middle" fill="#8b8fa3" font-size="10">Jan 25</text><line x1="710.8" y1="30" x2="710.8" y2="310" stroke="#2a2d3a" stroke-width="0.3" stroke-dasharray="4,4"/><text x="817.6" y="330" text-anchor="middle" fill="#8b8fa3" font-size="10">Jun 25</text><line x1="817.6" y1="30" x2="817.6" y2="310" stroke="#2a2d3a" stroke-width="0.3" stroke-dasharray="4,4"/><text x="924.4" y="330" text-anchor="middle" fill="#8b8fa3" font-size="10">Nov 25</text><line x1="924.4" y1="30" x2="924.4" y2="310" stroke="#2a2d3a" stroke-width="0.3" stroke-dasharray="4,4"/><text x="1031.2" y="330" text-anchor="middle" fill="#8b8fa3" font-size="10">Apr 26</text><line x1="1031.2" y1="30" x2="1031.2" y2="310" stroke="#2a2d3a" stroke-width="0.3" stroke-dasharray="4,4"/>
+  <line x1="70" y1="310" x2="1070" y2="310" stroke="#2a2d3a" stroke-width="0.5"/>
+
+  <!-- Area fills -->
+  <path d="M 70.0,310.0 L 70.0,309.5 L 79.7,304.4 L 89.4,299.6 L 99.1,296.4 L 108.8,293.6 L 118.5,290.5 L 128.3,287.9 L 138.0,285.4 L 147.7,282.8 L 157.4,279.4 L 167.1,275.4 L 176.8,271.3 L 186.5,267.5 L 196.2,264.9 L 205.9,261.7 L 215.6,257.9 L 225.3,253.7 L 235.0,250.7 L 244.8,247.2 L 254.5,243.3 L 264.2,239.2 L 273.9,236.7 L 283.6,234.2 L 293.3,231.5 L 303.0,229.0 L 312.7,227.0 L 322.4,224.5 L 332.1,222.6 L 341.8,219.8 L 351.6,217.3 L 361.3,215.0 L 371.0,213.8 L 380.7,213.5 L 390.4,211.8 L 400.1,210.3 L 409.8,208.5 L 419.5,206.6 L 429.2,204.6 L 438.9,202.6 L 448.6,200.8 L 458.3,198.9 L 468.1,196.9 L 477.8,194.5 L 487.5,193.0 L 497.2,191.4 L 506.9,189.8 L 516.6,188.5 L 526.3,186.7 L 536.0,184.4 L 545.7,182.1 L 555.4,180.3 L 565.1,178.5 L 574.9,176.4 L 584.6,174.6 L 594.3,172.7 L 604.0,170.8 L 613.7,169.3 L 623.4,168.2 L 633.1,166.9 L 642.8,164.2 L 652.5,161.2 L 662.2,159.1 L 671.9,156.6 L 681.7,154.9 L 691.4,153.0 L 701.1,150.7 L 710.8,148.7 L 720.5,146.3 L 730.2,143.6 L 739.9,139.8 L 749.6,135.3 L 759.3,130.2 L 769.0,126.4 L 778.7,122.0 L 788.4,118.9 L 798.2,115.6 L 807.9,112.5 L 817.6,109.0 L 827.3,106.1 L 837.0,104.6 L 846.7,102.8 L 856.4,101.1 L 866.1,99.5 L 875.8,98.4 L 885.5,96.8 L 895.2,95.4 L 905.0,94.1 L 914.7,93.2 L 924.4,92.2 L 934.1,90.7 L 943.8,88.4 L 953.5,87.1 L 963.2,85.9 L 972.9,84.4 L 982.6,82.5 L 992.3,80.8 L 1002.0,79.2 L 1011.7,77.2 L 1021.5,75.8 L 1031.2,74.0 L 1040.9,72.9 L 1050.6,71.3 L 1060.3,69.7 L 1070.0,69.2 L 1070.0,310.0 Z" fill="url(#pGrad)"/>
+  <path d="M 70.0,310.0 L 70.0,310.0 L 79.7,307.5 L 89.4,307.0 L 99.1,307.0 L 108.8,306.0 L 118.5,302.9 L 128.3,299.9 L 138.0,297.1 L 147.7,293.8 L 157.4,293.8 L 167.1,293.8 L 176.8,291.2 L 186.5,288.8 L 196.2,286.2 L 205.9,284.7 L 215.6,282.7 L 225.3,282.7 L 235.0,282.7 L 244.8,282.7 L 254.5,282.7 L 264.2,280.4 L 273.9,279.5 L 283.6,279.5 L 293.3,279.5 L 303.0,277.6 L 312.7,274.3 L 322.4,271.0 L 332.1,267.4 L 341.8,266.6 L 351.6,266.6 L 361.3,265.5 L 371.0,262.2 L 380.7,258.9 L 390.4,255.6 L 400.1,252.7 L 409.8,252.7 L 419.5,252.7 L 429.2,250.1 L 438.9,246.5 L 448.6,242.0 L 458.3,235.2 L 468.1,231.2 L 477.8,231.2 L 487.5,231.2 L 497.2,231.2 L 506.9,231.2 L 516.6,224.8 L 526.3,219.3 L 536.0,219.3 L 545.7,219.3 L 555.4,210.8 L 565.1,202.5 L 574.9,193.3 L 584.6,185.0 L 594.3,184.1 L 604.0,184.1 L 613.7,179.5 L 623.4,170.3 L 633.1,163.0 L 642.8,159.2 L 652.5,157.3 L 662.2,157.3 L 671.9,157.3 L 681.7,150.9 L 691.4,144.4 L 701.1,138.9 L 710.8,131.6 L 720.5,126.1 L 730.2,126.1 L 739.9,126.1 L 749.6,126.1 L 759.3,126.1 L 769.0,121.9 L 778.7,119.7 L 788.4,119.7 L 798.2,119.2 L 807.9,114.6 L 817.6,110.1 L 827.3,105.5 L 837.0,102.3 L 846.7,102.3 L 856.4,102.3 L 866.1,99.3 L 875.8,94.3 L 885.5,89.3 L 895.2,84.8 L 905.0,83.3 L 914.7,83.3 L 924.4,83.3 L 934.1,77.4 L 943.8,71.6 L 953.5,66.9 L 963.2,61.7 L 972.9,60.0 L 982.6,60.0 L 992.3,60.0 L 1002.0,60.0 L 1011.7,60.0 L 1021.5,58.3 L 1031.2,56.5 L 1040.9,56.5 L 1050.6,55.5 L 1060.3,51.8 L 1070.0,50.7 L 1070.0,310.0 Z" fill="url(#tGrad)"/>
+
+  <!-- Lines -->
+  <polyline points="70.0,309.5 79.7,304.4 89.4,299.6 99.1,296.4 108.8,293.6 118.5,290.5 128.3,287.9 138.0,285.4 147.7,282.8 157.4,279.4 167.1,275.4 176.8,271.3 186.5,267.5 196.2,264.9 205.9,261.7 215.6,257.9 225.3,253.7 235.0,250.7 244.8,247.2 254.5,243.3 264.2,239.2 273.9,236.7 283.6,234.2 293.3,231.5 303.0,229.0 312.7,227.0 322.4,224.5 332.1,222.6 341.8,219.8 351.6,217.3 361.3,215.0 371.0,213.8 380.7,213.5 390.4,211.8 400.1,210.3 409.8,208.5 419.5,206.6 429.2,204.6 438.9,202.6 448.6,200.8 458.3,198.9 468.1,196.9 477.8,194.5 487.5,193.0 497.2,191.4 506.9,189.8 516.6,188.5 526.3,186.7 536.0,184.4 545.7,182.1 555.4,180.3 565.1,178.5 574.9,176.4 584.6,174.6 594.3,172.7 604.0,170.8 613.7,169.3 623.4,168.2 633.1,166.9 642.8,164.2 652.5,161.2 662.2,159.1 671.9,156.6 681.7,154.9 691.4,153.0 701.1,150.7 710.8,148.7 720.5,146.3 730.2,143.6 739.9,139.8 749.6,135.3 759.3,130.2 769.0,126.4 778.7,122.0 788.4,118.9 798.2,115.6 807.9,112.5 817.6,109.0 827.3,106.1 837.0,104.6 846.7,102.8 856.4,101.1 866.1,99.5 875.8,98.4 885.5,96.8 895.2,95.4 905.0,94.1 914.7,93.2 924.4,92.2 934.1,90.7 943.8,88.4 953.5,87.1 963.2,85.9 972.9,84.4 982.6,82.5 992.3,80.8 1002.0,79.2 1011.7,77.2 1021.5,75.8 1031.2,74.0 1040.9,72.9 1050.6,71.3 1060.3,69.7 1070.0,69.2" fill="none" stroke="#fb923c" stroke-width="2" stroke-linejoin="round"/>
+  <polyline points="70.0,310.0 79.7,307.5 89.4,307.0 99.1,307.0 108.8,306.0 118.5,302.9 128.3,299.9 138.0,297.1 147.7,293.8 157.4,293.8 167.1,293.8 176.8,291.2 186.5,288.8 196.2,286.2 205.9,284.7 215.6,282.7 225.3,282.7 235.0,282.7 244.8,282.7 254.5,282.7 264.2,280.4 273.9,279.5 283.6,279.5 293.3,279.5 303.0,277.6 312.7,274.3 322.4,271.0 332.1,267.4 341.8,266.6 351.6,266.6 361.3,265.5 371.0,262.2 380.7,258.9 390.4,255.6 400.1,252.7 409.8,252.7 419.5,252.7 429.2,250.1 438.9,246.5 448.6,242.0 458.3,235.2 468.1,231.2 477.8,231.2 487.5,231.2 497.2,231.2 506.9,231.2 516.6,224.8 526.3,219.3 536.0,219.3 545.7,219.3 555.4,210.8 565.1,202.5 574.9,193.3 584.6,185.0 594.3,184.1 604.0,184.1 613.7,179.5 623.4,170.3 633.1,163.0 642.8,159.2 652.5,157.3 662.2,157.3 671.9,157.3 681.7,150.9 691.4,144.4 701.1,138.9 710.8,131.6 720.5,126.1 730.2,126.1 739.9,126.1 749.6,126.1 759.3,126.1 769.0,121.9 778.7,119.7 788.4,119.7 798.2,119.2 807.9,114.6 817.6,110.1 827.3,105.5 837.0,102.3 846.7,102.3 856.4,102.3 866.1,99.3 875.8,94.3 885.5,89.3 895.2,84.8 905.0,83.3 914.7,83.3 924.4,83.3 934.1,77.4 943.8,71.6 953.5,66.9 963.2,61.7 972.9,60.0 982.6,60.0 992.3,60.0 1002.0,60.0 1011.7,60.0 1021.5,58.3 1031.2,56.5 1040.9,56.5 1050.6,55.5 1060.3,51.8 1070.0,50.7" fill="none" stroke="#4f8ff7" stroke-width="2" stroke-linejoin="round"/>
+
+  <!-- End-point labels -->
+  <circle cx="1070.0" cy="50.7" r="3.5" fill="#4f8ff7"/>
+  <text x="1070.0" y="42.7" text-anchor="middle" fill="#4f8ff7" font-size="10" font-weight="600">36.3 bn</text>
+  <circle cx="1070.0" cy="69.2" r="3.5" fill="#fb923c"/>
+  <text x="1070.0" y="85.2" text-anchor="middle" fill="#fb923c" font-size="10" font-weight="600">33.7 bn</text>
+
+  <!-- Y-axis title -->
+  <text x="18" y="180.0" text-anchor="middle" fill="#8b8fa3" font-size="10" transform="rotate(-90 18 180.0)">Cumulative Buyback (USD bn)</text>
+
+  <!-- Legend -->
+  <rect x="70" y="4" width="12" height="3" rx="1.5" fill="#4f8ff7"/>
+  <text x="86" y="8" fill="#e4e6ef" font-size="10">Tencent</text>
+  <rect x="150" y="4" width="12" height="3" rx="1.5" fill="#fb923c"/>
+  <text x="166" y="8" fill="#e4e6ef" font-size="10">Prosus</text>
+</svg>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== PAGE 2: TENCENT DETAILS ========== -->
+  <div class="page page1">
+    <div class="table-card">
+      <div class="table-header">Tencent Buyback Daily</div>
+      <div class="scroll-table">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Shares</th><th>High (HKD)</th><th>Low (HKD)</th><th>Total (HKD mn)</th><th>Total (USD mn)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>2026-06-11</td><td>1,083,000</td><td>475.2</td><td>455.0</td><td>500.6</td><td>63.9</td></tr>
+<tr><td>2026-06-10</td><td>1,081,000</td><td>470.8</td><td>452.2</td><td>500.7</td><td>63.9</td></tr>
+<tr><td>2026-06-09</td><td>1,090,000</td><td>468.2</td><td>443.8</td><td>500.4</td><td>63.9</td></tr>
+<tr><td>2026-06-08</td><td>1,116,000</td><td>457.6</td><td>443.4</td><td>500.8</td><td>63.9</td></tr>
+<tr><td>2026-06-05</td><td>1,092,000</td><td>465.8</td><td>452.4</td><td>500.4</td><td>63.9</td></tr>
+<tr><td>2026-06-04</td><td>1,091,000</td><td>468.0</td><td>455.2</td><td>500.5</td><td>63.9</td></tr>
+<tr><td>2026-06-03</td><td>275,500</td><td>462.8</td><td>461.8</td><td>127.4</td><td>16.3</td></tr>
+<tr><td>2026-06-02</td><td>234,600</td><td>453.8</td><td>438.0</td><td>104.1</td><td>13.3</td></tr>
+<tr><td>2026-06-01</td><td>1,148,000</td><td>441.8</td><td>430.4</td><td>500.7</td><td>63.9</td></tr>
+<tr><td>2026-05-29</td><td>1,167,000</td><td>438.0</td><td>423.6</td><td>500.9</td><td>63.9</td></tr>
+<tr><td>2026-05-28</td><td>1,179,000</td><td>431.2</td><td>420.4</td><td>500.8</td><td>63.9</td></tr>
+<tr><td>2026-05-27</td><td>1,149,000</td><td>442.0</td><td>433.6</td><td>500.7</td><td>63.9</td></tr>
+<tr><td>2026-05-26</td><td>1,144,000</td><td>440.6</td><td>432.4</td><td>500.9</td><td>63.9</td></tr>
+<tr><td>2026-05-22</td><td>1,132,000</td><td>445.0</td><td>439.0</td><td>500.6</td><td>63.9</td></tr>
+<tr><td>2026-05-21</td><td>1,119,000</td><td>460.0</td><td>438.6</td><td>500.6</td><td>63.9</td></tr>
+<tr><td>2026-05-20</td><td>1,096,000</td><td>462.0</td><td>453.6</td><td>500.9</td><td>63.9</td></tr>
+<tr><td>2026-05-19</td><td>1,088,000</td><td>468.6</td><td>448.6</td><td>500.9</td><td>63.9</td></tr>
+<tr><td>2026-05-18</td><td>1,112,000</td><td>457.4</td><td>445.8</td><td>500.7</td><td>63.9</td></tr>
+<tr><td>2026-04-09</td><td>1,964,000</td><td>514.5</td><td>503.0</td><td>1,000.9</td><td>127.7</td></tr>
+<tr><td>2026-04-08</td><td>1,979,000</td><td>510.0</td><td>501.0</td><td>1,000.8</td><td>127.7</td></tr>
+<tr><td>2026-04-02</td><td>615,000</td><td>496.0</td><td>485.2</td><td>300.7</td><td>38.4</td></tr>
+<tr><td>2026-04-01</td><td>603,000</td><td>504.0</td><td>493.2</td><td>300.4</td><td>38.3</td></tr>
+<tr><td>2026-03-31</td><td>621,000</td><td>490.4</td><td>480.2</td><td>300.6</td><td>38.4</td></tr>
+<tr><td>2026-03-30</td><td>624,000</td><td>485.0</td><td>476.4</td><td>300.6</td><td>38.4</td></tr>
+<tr><td>2026-03-27</td><td>610,000</td><td>498.0</td><td>488.0</td><td>300.7</td><td>38.4</td></tr>
+<tr><td>2026-03-26</td><td>590,000</td><td>506.0</td><td>495.2</td><td>294.9</td><td>37.7</td></tr>
+<tr><td>2026-01-15</td><td>1,017,000</td><td>632.0</td><td>619.0</td><td>635.6</td><td>81.7</td></tr>
+<tr><td>2026-01-14</td><td>1,006,000</td><td>638.0</td><td>626.0</td><td>636.0</td><td>81.7</td></tr>
+<tr><td>2026-01-13</td><td>1,012,000</td><td>638.0</td><td>623.0</td><td>636.0</td><td>81.7</td></tr>
+<tr><td>2026-01-12</td><td>1,024,000</td><td>627.0</td><td>614.0</td><td>635.7</td><td>81.7</td></tr>
+<tr><td>2026-01-09</td><td>1,039,000</td><td>616.0</td><td>610.5</td><td>635.9</td><td>81.7</td></tr>
+<tr><td>2026-01-08</td><td>1,034,000</td><td>618.5</td><td>610.5</td><td>635.6</td><td>81.7</td></tr>
+<tr><td>2026-01-07</td><td>1,023,000</td><td>628.0</td><td>615.5</td><td>635.9</td><td>81.7</td></tr>
+<tr><td>2026-01-06</td><td>1,003,000</td><td>638.0</td><td>626.5</td><td>635.6</td><td>81.7</td></tr>
+<tr><td>2026-01-05</td><td>1,018,000</td><td>627.5</td><td>617.0</td><td>635.6</td><td>81.7</td></tr>
+<tr><td>2026-01-02</td><td>1,029,000</td><td>624.0</td><td>600.5</td><td>635.8</td><td>81.7</td></tr>
+<tr><td>2025-12-31</td><td>1,061,000</td><td>602.0</td><td>596.0</td><td>635.5</td><td>81.7</td></tr>
+<tr><td>2025-12-30</td><td>1,062,000</td><td>600.5</td><td>594.5</td><td>635.7</td><td>81.7</td></tr>
+<tr><td>2025-12-29</td><td>1,057,000</td><td>611.0</td><td>596.0</td><td>635.6</td><td>81.7</td></tr>
+<tr><td>2025-12-24</td><td>1,056,000</td><td>604.0</td><td>598.0</td><td>635.5</td><td>81.7</td></tr>
+<tr><td>2025-12-23</td><td>1,051,000</td><td>613.5</td><td>602.5</td><td>635.8</td><td>81.7</td></tr>
+<tr><td>2025-12-22</td><td>1,035,000</td><td>620.0</td><td>610.5</td><td>635.6</td><td>81.7</td></tr>
+<tr><td>2025-12-19</td><td>1,038,000</td><td>617.0</td><td>607.0</td><td>635.8</td><td>81.7</td></tr>
+<tr><td>2025-12-18</td><td>1,055,000</td><td>605.5</td><td>599.5</td><td>635.6</td><td>81.7</td></tr>
+<tr><td>2025-12-17</td><td>1,057,000</td><td>605.5</td><td>595.0</td><td>635.7</td><td>81.7</td></tr>
+<tr><td>2025-12-16</td><td>1,067,000</td><td>602.5</td><td>592.5</td><td>635.7</td><td>81.7</td></tr>
+<tr><td>2025-12-15</td><td>1,051,000</td><td>608.0</td><td>602.5</td><td>635.8</td><td>81.7</td></tr>
+<tr><td>2025-12-12</td><td>1,044,000</td><td>616.0</td><td>601.5</td><td>635.8</td><td>81.7</td></tr>
+<tr><td>2025-12-11</td><td>1,054,000</td><td>611.0</td><td>599.5</td><td>635.9</td><td>81.7</td></tr>
+<tr><td>2025-12-10</td><td>1,060,000</td><td>603.0</td><td>595.5</td><td>635.5</td><td>81.7</td></tr>
+<tr><td>2025-12-09</td><td>1,056,000</td><td>609.5</td><td>596.5</td><td>635.7</td><td>81.7</td></tr>
+<tr><td>2025-12-08</td><td>1,049,000</td><td>608.5</td><td>604.5</td><td>635.8</td><td>81.7</td></tr>
+<tr><td>2025-12-05</td><td>1,046,000</td><td>610.5</td><td>605.0</td><td>636.0</td><td>81.7</td></tr>
+<tr><td>2025-12-04</td><td>1,044,000</td><td>613.0</td><td>605.0</td><td>635.7</td><td>81.7</td></tr>
+<tr><td>2025-12-03</td><td>1,040,000</td><td>616.0</td><td>609.0</td><td>635.6</td><td>81.7</td></tr>
+<tr><td>2025-12-02</td><td>1,028,000</td><td>625.5</td><td>615.5</td><td>635.9</td><td>81.7</td></tr>
+<tr><td>2025-12-01</td><td>1,029,000</td><td>623.0</td><td>613.0</td><td>635.9</td><td>81.7</td></tr>
+<tr><td>2025-11-28</td><td>1,039,000</td><td>616.5</td><td>609.0</td><td>635.6</td><td>81.8</td></tr>
+<tr><td>2025-11-27</td><td>1,036,000</td><td>620.0</td><td>609.0</td><td>635.7</td><td>81.8</td></tr>
+<tr><td>2025-11-26</td><td>1,022,000</td><td>629.0</td><td>618.5</td><td>635.7</td><td>81.8</td></tr>
+<tr><td>2025-11-25</td><td>1,014,000</td><td>634.5</td><td>620.5</td><td>635.5</td><td>81.8</td></tr>
+<tr><td>2025-11-24</td><td>1,022,000</td><td>626.5</td><td>613.5</td><td>635.7</td><td>81.8</td></tr>
+<tr><td>2025-11-21</td><td>1,042,000</td><td>614.5</td><td>606.5</td><td>635.9</td><td>81.8</td></tr>
+<tr><td>2025-11-20</td><td>1,026,000</td><td>628.5</td><td>616.0</td><td>636.0</td><td>81.9</td></tr>
+<tr><td>2025-11-19</td><td>1,018,000</td><td>630.5</td><td>619.5</td><td>635.5</td><td>81.8</td></tr>
+<tr><td>2025-11-18</td><td>1,013,000</td><td>640.5</td><td>620.5</td><td>635.6</td><td>81.8</td></tr>
+<tr><td>2025-10-10</td><td>839,000</td><td>669.0</td><td>648.0</td><td>550.4</td><td>70.7</td></tr>
+<tr><td>2025-10-09</td><td>816,000</td><td>680.5</td><td>666.0</td><td>550.6</td><td>70.7</td></tr>
+<tr><td>2025-10-08</td><td>817,000</td><td>680.0</td><td>669.5</td><td>551.0</td><td>70.8</td></tr>
+<tr><td>2025-10-06</td><td>815,000</td><td>682.0</td><td>670.5</td><td>550.3</td><td>70.7</td></tr>
+<tr><td>2025-10-03</td><td>817,000</td><td>680.0</td><td>670.5</td><td>550.4</td><td>70.7</td></tr>
+<tr><td>2025-10-02</td><td>812,000</td><td>683.0</td><td>666.0</td><td>550.3</td><td>70.7</td></tr>
+<tr><td>2025-09-30</td><td>832,000</td><td>666.5</td><td>657.5</td><td>551.0</td><td>70.2</td></tr>
+<tr><td>2025-09-29</td><td>837,000</td><td>664.0</td><td>648.0</td><td>550.7</td><td>70.2</td></tr>
+<tr><td>2025-09-26</td><td>850,000</td><td>652.5</td><td>640.0</td><td>550.3</td><td>70.1</td></tr>
+<tr><td>2025-09-25</td><td>844,000</td><td>658.5</td><td>644.0</td><td>550.3</td><td>70.1</td></tr>
+<tr><td>2025-09-24</td><td>858,000</td><td>650.5</td><td>628.5</td><td>550.5</td><td>70.1</td></tr>
+<tr><td>2025-09-23</td><td>867,000</td><td>643.0</td><td>627.0</td><td>550.4</td><td>70.1</td></tr>
+<tr><td>2025-09-22</td><td>867,000</td><td>643.0</td><td>635.0</td><td>550.4</td><td>70.1</td></tr>
+<tr><td>2025-09-19</td><td>857,000</td><td>647.0</td><td>638.5</td><td>550.8</td><td>70.2</td></tr>
+<tr><td>2025-09-18</td><td>848,000</td><td>664.0</td><td>636.0</td><td>550.3</td><td>70.1</td></tr>
+<tr><td>2025-09-17</td><td>839,000</td><td>663.5</td><td>645.5</td><td>550.9</td><td>70.2</td></tr>
+<tr><td>2025-09-16</td><td>853,000</td><td>649.0</td><td>641.0</td><td>550.6</td><td>70.1</td></tr>
+<tr><td>2025-09-15</td><td>856,000</td><td>648.0</td><td>637.5</td><td>550.9</td><td>70.2</td></tr>
+<tr><td>2025-09-12</td><td>852,000</td><td>649.0</td><td>642.0</td><td>550.4</td><td>70.1</td></tr>
+<tr><td>2025-09-11</td><td>874,000</td><td>633.0</td><td>624.0</td><td>550.5</td><td>70.1</td></tr>
+<tr><td>2025-09-10</td><td>866,000</td><td>638.5</td><td>628.5</td><td>550.4</td><td>70.1</td></tr>
+<tr><td>2025-09-09</td><td>883,000</td><td>627.5</td><td>619.0</td><td>551.0</td><td>70.2</td></tr>
+<tr><td>2025-09-08</td><td>897,000</td><td>618.5</td><td>605.5</td><td>550.5</td><td>70.1</td></tr>
+<tr><td>2025-09-05</td><td>913,000</td><td>608.5</td><td>597.0</td><td>550.8</td><td>70.2</td></tr>
+<tr><td>2025-09-04</td><td>925,000</td><td>605.0</td><td>591.0</td><td>550.6</td><td>70.1</td></tr>
+<tr><td>2025-09-03</td><td>916,000</td><td>612.5</td><td>596.5</td><td>550.7</td><td>70.2</td></tr>
+<tr><td>2025-09-02</td><td>913,000</td><td>608.0</td><td>599.5</td><td>550.4</td><td>70.1</td></tr>
+<tr><td>2025-09-01</td><td>910,000</td><td>609.5</td><td>601.5</td><td>550.5</td><td>70.1</td></tr>
+<tr><td>2025-08-29</td><td>919,000</td><td>605.0</td><td>594.5</td><td>550.3</td><td>70.1</td></tr>
+<tr><td>2025-08-28</td><td>927,000</td><td>598.5</td><td>590.5</td><td>550.8</td><td>70.2</td></tr>
+<tr><td>2025-08-27</td><td>909,000</td><td>614.5</td><td>596.0</td><td>550.3</td><td>70.1</td></tr>
+<tr><td>2025-08-26</td><td>899,000</td><td>617.5</td><td>609.5</td><td>550.8</td><td>70.2</td></tr>
+<tr><td>2025-08-25</td><td>895,000</td><td>620.0</td><td>608.5</td><td>550.8</td><td>70.2</td></tr>
+<tr><td>2025-08-22</td><td>917,000</td><td>606.0</td><td>596.0</td><td>550.5</td><td>70.1</td></tr>
+<tr><td>2025-08-21</td><td>928,000</td><td>597.0</td><td>590.0</td><td>550.8</td><td>70.2</td></tr>
+<tr><td>2025-08-20</td><td>934,000</td><td>594.0</td><td>586.0</td><td>550.9</td><td>70.2</td></tr>
+<tr><td>2025-08-19</td><td>932,000</td><td>596.5</td><td>583.0</td><td>550.4</td><td>70.1</td></tr>
+<tr><td>2025-08-18</td><td>931,000</td><td>595.5</td><td>587.0</td><td>550.4</td><td>70.1</td></tr>
+<tr><td>2025-07-10</td><td>1,008,000</td><td>498.0</td><td>494.4</td><td>500.3</td><td>63.7</td></tr>
+<tr><td>2025-07-09</td><td>1,005,000</td><td>504.0</td><td>495.2</td><td>500.3</td><td>63.7</td></tr>
+<tr><td>2025-07-08</td><td>995,000</td><td>505.0</td><td>500.0</td><td>500.3</td><td>63.7</td></tr>
+<tr><td>2025-07-07</td><td>1,002,000</td><td>502.0</td><td>494.4</td><td>500.6</td><td>63.8</td></tr>
+<tr><td>2025-07-06</td><td>1,007,000</td><td>501.0</td><td>493.0</td><td>500.3</td><td>63.7</td></tr>
+<tr><td>2025-07-05</td><td>1,004,000</td><td>503.0</td><td>495.0</td><td>500.7</td><td>63.8</td></tr>
+<tr><td>2025-07-04</td><td>996,000</td><td>508.0</td><td>500.5</td><td>500.4</td><td>63.8</td></tr>
+<tr><td>2025-06-30</td><td>989,000</td><td>510.0</td><td>503.0</td><td>500.4</td><td>63.8</td></tr>
+<tr><td>2025-06-27</td><td>978,000</td><td>513.5</td><td>510.0</td><td>500.2</td><td>63.8</td></tr>
+<tr><td>2025-06-26</td><td>979,000</td><td>513.0</td><td>508.0</td><td>500.2</td><td>63.8</td></tr>
+<tr><td>2025-06-25</td><td>979,000</td><td>514.5</td><td>508.5</td><td>500.4</td><td>63.8</td></tr>
+<tr><td>2025-06-24</td><td>985,000</td><td>510.0</td><td>505.5</td><td>500.6</td><td>63.9</td></tr>
+<tr><td>2025-06-23</td><td>1,001,000</td><td>504.0</td><td>495.2</td><td>500.6</td><td>63.9</td></tr>
+<tr><td>2025-06-20</td><td>997,000</td><td>504.6</td><td>496.2</td><td>500.5</td><td>63.8</td></tr>
+<tr><td>2025-06-19</td><td>1,002,000</td><td>506.0</td><td>496.2</td><td>500.4</td><td>63.8</td></tr>
+<tr><td>2025-06-18</td><td>990,000</td><td>510.0</td><td>503.5</td><td>500.7</td><td>63.9</td></tr>
+<tr><td>2025-06-17</td><td>980,000</td><td>514.0</td><td>507.0</td><td>500.5</td><td>63.8</td></tr>
+<tr><td>2025-06-16</td><td>985,000</td><td>511.0</td><td>505.0</td><td>500.1</td><td>63.8</td></tr>
+<tr><td>2025-06-13</td><td>982,000</td><td>515.0</td><td>506.5</td><td>500.4</td><td>63.8</td></tr>
+<tr><td>2025-06-12</td><td>975,000</td><td>518.0</td><td>508.0</td><td>500.3</td><td>63.8</td></tr>
+<tr><td>2025-06-11</td><td>969,000</td><td>518.0</td><td>514.5</td><td>500.5</td><td>63.8</td></tr>
+<tr><td>2025-06-10</td><td>973,000</td><td>520.0</td><td>509.0</td><td>500.5</td><td>63.8</td></tr>
+<tr><td>2025-06-09</td><td>968,000</td><td>520.5</td><td>513.0</td><td>500.6</td><td>63.8</td></tr>
+<tr><td>2025-06-06</td><td>975,000</td><td>516.5</td><td>511.5</td><td>500.8</td><td>63.9</td></tr>
+<tr><td>2025-06-05</td><td>975,000</td><td>517.5</td><td>509.5</td><td>500.7</td><td>63.9</td></tr>
+<tr><td>2025-06-04</td><td>980,000</td><td>513.0</td><td>507.5</td><td>500.3</td><td>63.8</td></tr>
+<tr><td>2025-06-03</td><td>994,000</td><td>505.0</td><td>501.0</td><td>500.5</td><td>63.8</td></tr>
+<tr><td>2025-06-02</td><td>1,013,000</td><td>498.4</td><td>490.0</td><td>500.5</td><td>63.8</td></tr>
+<tr><td>2025-05-30</td><td>1,003,000</td><td>504.5</td><td>496.2</td><td>500.6</td><td>64.5</td></tr>
+<tr><td>2025-05-29</td><td>985,000</td><td>511.5</td><td>504.0</td><td>500.2</td><td>64.5</td></tr>
+<tr><td>2025-05-28</td><td>985,000</td><td>515.0</td><td>503.0</td><td>500.5</td><td>64.5</td></tr>
+<tr><td>2025-05-27</td><td>979,000</td><td>514.0</td><td>507.0</td><td>500.3</td><td>64.5</td></tr>
+<tr><td>2025-05-26</td><td>979,000</td><td>516.0</td><td>508.5</td><td>500.4</td><td>64.5</td></tr>
+<tr><td>2025-05-23</td><td>970,000</td><td>520.0</td><td>512.5</td><td>500.6</td><td>64.5</td></tr>
+<tr><td>2025-05-22</td><td>970,000</td><td>520.0</td><td>513.0</td><td>500.6</td><td>64.5</td></tr>
+<tr><td>2025-05-21</td><td>963,000</td><td>524.0</td><td>516.0</td><td>500.4</td><td>64.5</td></tr>
+<tr><td>2025-05-20</td><td>971,000</td><td>517.0</td><td>512.5</td><td>500.2</td><td>64.5</td></tr>
+<tr><td>2025-05-19</td><td>979,000</td><td>516.5</td><td>503.0</td><td>500.4</td><td>64.5</td></tr>
+<tr><td>2025-04-10</td><td>1,333,000</td><td>461.4</td><td>443.2</td><td>600.7</td><td>77.4</td></tr>
+<tr><td>2025-04-09</td><td>1,385,000</td><td>446.8</td><td>419.6</td><td>600.7</td><td>77.4</td></tr>
+<tr><td>2025-04-08</td><td>1,364,000</td><td>449.6</td><td>430.2</td><td>600.6</td><td>77.4</td></tr>
+<tr><td>2025-04-07</td><td>1,350,000</td><td>461.8</td><td>431.2</td><td>600.9</td><td>77.4</td></tr>
+<tr><td>2025-04-03</td><td>1,011,000</td><td>498.8</td><td>492.0</td><td>500.7</td><td>64.5</td></tr>
+<tr><td>2025-04-02</td><td>996,000</td><td>508.0</td><td>499.4</td><td>500.9</td><td>64.6</td></tr>
+<tr><td>2025-04-01</td><td>991,000</td><td>510.5</td><td>501.0</td><td>500.9</td><td>64.6</td></tr>
+<tr><td>2025-03-31</td><td>1,002,000</td><td>506.5</td><td>495.0</td><td>500.5</td><td>64.4</td></tr>
+<tr><td>2025-03-28</td><td>982,000</td><td>515.5</td><td>503.5</td><td>500.6</td><td>64.4</td></tr>
+<tr><td>2025-03-27</td><td>981,000</td><td>515.5</td><td>502.5</td><td>500.6</td><td>64.4</td></tr>
+<tr><td>2025-03-26</td><td>990,000</td><td>509.5</td><td>502.0</td><td>500.8</td><td>64.4</td></tr>
+<tr><td>2025-03-25</td><td>989,000</td><td>515.0</td><td>501.5</td><td>500.5</td><td>64.4</td></tr>
+<tr><td>2025-03-24</td><td>980,000</td><td>517.5</td><td>505.0</td><td>500.5</td><td>64.4</td></tr>
+<tr><td>2025-01-16</td><td>3,930,000</td><td>386.4</td><td>376.8</td><td>1,500.1</td><td>193.2</td></tr>
+<tr><td>2025-01-15</td><td>3,960,000</td><td>385.2</td><td>373.2</td><td>1,503.4</td><td>193.7</td></tr>
+<tr><td>2025-01-14</td><td>4,010,000</td><td>379.4</td><td>365.6</td><td>1,501.1</td><td>193.4</td></tr>
+<tr><td>2025-01-13</td><td>4,080,000</td><td>371.2</td><td>364.8</td><td>1,503.4</td><td>193.7</td></tr>
+<tr><td>2025-01-10</td><td>4,010,000</td><td>379.2</td><td>370.2</td><td>1,500.8</td><td>193.3</td></tr>
+<tr><td>2025-01-09</td><td>4,010,000</td><td>379.2</td><td>365.0</td><td>1,500.6</td><td>193.3</td></tr>
+<tr><td>2025-01-08</td><td>4,050,000</td><td>379.2</td><td>366.0</td><td>-</td><td>-</td></tr>
+<tr><td>2025-01-07</td><td>3,930,000</td><td>392.4</td><td>376.8</td><td>1,501.0</td><td>193.4</td></tr>
+<tr><td>2025-01-06</td><td>1,710,000</td><td>415.0</td><td>407.4</td><td>701.0</td><td>90.3</td></tr>
+<tr><td>2025-01-03</td><td>1,690,000</td><td>418.6</td><td>411.2</td><td>700.9</td><td>90.3</td></tr>
+<tr><td>2025-01-02</td><td>1,680,000</td><td>424.6</td><td>413.8</td><td>701.5</td><td>90.4</td></tr>
+<tr><td>2024-12-31</td><td>1,370,000</td><td>421.4</td><td>416.0</td><td>574.0</td><td>73.9</td></tr>
+<tr><td>2024-12-30</td><td>1,680,000</td><td>421.4</td><td>416.0</td><td>703.0</td><td>90.6</td></tr>
+<tr><td>2024-12-27</td><td>1,680,000</td><td>420.6</td><td>415.6</td><td>701.7</td><td>90.4</td></tr>
+<tr><td>2024-12-24</td><td>1,200,000</td><td>421.4</td><td>417.8</td><td>503.4</td><td>64.9</td></tr>
+<tr><td>2024-12-23</td><td>1,670,000</td><td>430.6</td><td>416.4</td><td>703.8</td><td>90.7</td></tr>
+<tr><td>2024-12-20</td><td>1,650,000</td><td>428.2</td><td>414.2</td><td>703.3</td><td>90.6</td></tr>
+<tr><td>2024-12-19</td><td>1,720,000</td><td>421.8</td><td>401.4</td><td>702.9</td><td>90.6</td></tr>
+<tr><td>2024-12-18</td><td>1,730,000</td><td>406.0</td><td>405.2</td><td>702.6</td><td>90.5</td></tr>
+<tr><td>2024-12-17</td><td>1,740,000</td><td>407.0</td><td>401.8</td><td>703.0</td><td>90.6</td></tr>
+<tr><td>2024-12-16</td><td>1,720,000</td><td>410.8</td><td>403.8</td><td>700.3</td><td>90.2</td></tr>
+<tr><td>2024-12-13</td><td>1,710,000</td><td>414.6</td><td>408.6</td><td>703.5</td><td>90.6</td></tr>
+<tr><td>2024-12-12</td><td>1,690,000</td><td>422.4</td><td>409.8</td><td>703.8</td><td>90.7</td></tr>
+<tr><td>2024-12-11</td><td>1,710,000</td><td>414.8</td><td>407.2</td><td>702.0</td><td>90.4</td></tr>
+<tr><td>2024-12-10</td><td>1,680,000</td><td>429.2</td><td>411.0</td><td>702.9</td><td>90.5</td></tr>
+<tr><td>2024-12-09</td><td>1,710,000</td><td>418.8</td><td>406.2</td><td>701.1</td><td>90.3</td></tr>
+<tr><td>2024-12-06</td><td>1,700,000</td><td>414.4</td><td>405.4</td><td>698.1</td><td>89.9</td></tr>
+<tr><td>2024-12-05</td><td>1,740,000</td><td>406.6</td><td>401.0</td><td>704.4</td><td>90.7</td></tr>
+<tr><td>2024-12-04</td><td>1,740,000</td><td>405.4</td><td>399.8</td><td>700.7</td><td>90.3</td></tr>
+<tr><td>2024-12-03</td><td>1,760,000</td><td>404.2</td><td>395.0</td><td>703.2</td><td>90.6</td></tr>
+<tr><td>2024-12-02</td><td>1,760,000</td><td>401.2</td><td>395.6</td><td>701.2</td><td>90.3</td></tr>
+<tr><td>2024-11-29</td><td>1,760,000</td><td>402.4</td><td>395.0</td><td>700.1</td><td>90.0</td></tr>
+<tr><td>2024-11-28</td><td>1,750,000</td><td>403.8</td><td>397.6</td><td>700.5</td><td>90.0</td></tr>
+<tr><td>2024-11-27</td><td>1,770,000</td><td>405.8</td><td>392.2</td><td>703.8</td><td>90.4</td></tr>
+<tr><td>2024-11-26</td><td>1,780,000</td><td>399.0</td><td>392.2</td><td>702.9</td><td>90.3</td></tr>
+<tr><td>2024-11-25</td><td>1,770,000</td><td>402.0</td><td>394.0</td><td>702.1</td><td>90.2</td></tr>
+<tr><td>2024-11-22</td><td>1,730,000</td><td>412.2</td><td>399.8</td><td>701.8</td><td>90.2</td></tr>
+<tr><td>2024-11-21</td><td>1,720,000</td><td>411.2</td><td>407.4</td><td>704.1</td><td>90.5</td></tr>
+<tr><td>2024-11-20</td><td>1,710,000</td><td>413.4</td><td>406.6</td><td>701.1</td><td>90.1</td></tr>
+<tr><td>2024-11-19</td><td>1,730,000</td><td>409.0</td><td>403.4</td><td>702.8</td><td>90.3</td></tr>
+<tr><td>2024-11-18</td><td>1,730,000</td><td>412.8</td><td>401.8</td><td>702.9</td><td>90.3</td></tr>
+<tr><td>2024-11-15</td><td>1,750,000</td><td>406.8</td><td>399.2</td><td>703.4</td><td>90.4</td></tr>
+<tr><td>2024-10-09</td><td>1,600,000</td><td>450.4</td><td>424.0</td><td>702.8</td><td>90.4</td></tr>
+<tr><td>2024-10-08</td><td>1,560,000</td><td>474.8</td><td>438.6</td><td>702.6</td><td>90.4</td></tr>
+<tr><td>2024-10-07</td><td>1,050,000</td><td>482.2</td><td>470.0</td><td>501.7</td><td>64.6</td></tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== PAGE 3: PROSUS DETAILS ========== -->
+  <div class="page page2">
+    <div class="table-card">
+      <div class="table-header">Prosus Buyback Daily</div>
+      <div class="scroll-table">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Shares</th><th>Price (EUR)</th><th>Total (USD mn)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>2026-06-05</td><td>425,492</td><td>40.6</td><td>20.0</td></tr>
+<tr><td>2026-06-04</td><td>465,228</td><td>40.1</td><td>21.7</td></tr>
+<tr><td>2026-06-03</td><td>580,664</td><td>40.8</td><td>27.5</td></tr>
+<tr><td>2026-06-02</td><td>664,972</td><td>42.5</td><td>32.9</td></tr>
+<tr><td>2026-06-01</td><td>495,241</td><td>39.0</td><td>22.5</td></tr>
+<tr><td>2026-05-29</td><td>420,246</td><td>39.0</td><td>19.1</td></tr>
+<tr><td>2026-05-28</td><td>454,177</td><td>38.8</td><td>20.5</td></tr>
+<tr><td>2026-05-27</td><td>425,972</td><td>39.2</td><td>19.4</td></tr>
+<tr><td>2026-05-26</td><td>363,638</td><td>39.6</td><td>16.7</td></tr>
+<tr><td>2026-05-25</td><td>366,121</td><td>40.5</td><td>17.3</td></tr>
+<tr><td>2026-05-22</td><td>541,158</td><td>39.2</td><td>24.6</td></tr>
+<tr><td>2026-05-21</td><td>477,679</td><td>39.9</td><td>22.1</td></tr>
+<tr><td>2026-05-20</td><td>422,593</td><td>40.5</td><td>19.9</td></tr>
+<tr><td>2026-05-19</td><td>468,278</td><td>40.6</td><td>22.0</td></tr>
+<tr><td>2026-05-18</td><td>391,548</td><td>39.1</td><td>17.8</td></tr>
+<tr><td>2026-05-15</td><td>446,538</td><td>39.1</td><td>20.3</td></tr>
+<tr><td>2026-05-14</td><td>410,867</td><td>39.2</td><td>18.8</td></tr>
+<tr><td>2026-05-13</td><td>589,236</td><td>39.2</td><td>27.0</td></tr>
+<tr><td>2026-05-12</td><td>713,817</td><td>38.3</td><td>32.1</td></tr>
+<tr><td>2026-05-11</td><td>381,988</td><td>40.9</td><td>18.4</td></tr>
+<tr><td>2026-05-08</td><td>360,753</td><td>41.4</td><td>17.6</td></tr>
+<tr><td>2026-05-07</td><td>434,654</td><td>42.3</td><td>21.6</td></tr>
+<tr><td>2026-05-06</td><td>503,345</td><td>41.7</td><td>24.7</td></tr>
+<tr><td>2026-05-05</td><td>384,808</td><td>40.7</td><td>18.3</td></tr>
+<tr><td>2026-05-04</td><td>444,077</td><td>41.0</td><td>21.3</td></tr>
+<tr><td>2026-05-01</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>2026-04-30</td><td>380,746</td><td>40.7</td><td>18.2</td></tr>
+<tr><td>2026-04-29</td><td>358,894</td><td>40.6</td><td>17.0</td></tr>
+<tr><td>2026-04-28</td><td>364,732</td><td>40.8</td><td>17.4</td></tr>
+<tr><td>2026-04-27</td><td>423,783</td><td>40.8</td><td>20.3</td></tr>
+<tr><td>2026-04-24</td><td>382,417</td><td>41.5</td><td>18.6</td></tr>
+<tr><td>2026-04-23</td><td>370,245</td><td>41.7</td><td>18.1</td></tr>
+<tr><td>2026-04-22</td><td>377,921</td><td>42.5</td><td>18.8</td></tr>
+<tr><td>2026-04-21</td><td>394,978</td><td>43.5</td><td>20.2</td></tr>
+<tr><td>2026-04-20</td><td>363,733</td><td>43.9</td><td>18.8</td></tr>
+<tr><td>2026-04-17</td><td>640,652</td><td>44.1</td><td>33.4</td></tr>
+<tr><td>2026-04-16</td><td>414,587</td><td>43.0</td><td>21.0</td></tr>
+<tr><td>2026-04-15</td><td>539,747</td><td>42.2</td><td>26.9</td></tr>
+<tr><td>2026-04-14</td><td>634,966</td><td>41.9</td><td>31.4</td></tr>
+<tr><td>2026-04-13</td><td>404,335</td><td>41.0</td><td>19.4</td></tr>
+<tr><td>2026-04-10</td><td>379,560</td><td>41.7</td><td>18.6</td></tr>
+<tr><td>2026-04-09</td><td>429,149</td><td>41.8</td><td>21.0</td></tr>
+<tr><td>2026-04-08</td><td>623,340</td><td>42.6</td><td>31.1</td></tr>
+<tr><td>2026-04-07</td><td>410,986</td><td>40.0</td><td>19.0</td></tr>
+<tr><td>2026-04-02</td><td>400,451</td><td>39.7</td><td>18.3</td></tr>
+<tr><td>2026-04-01</td><td>490,157</td><td>40.4</td><td>23.0</td></tr>
+<tr><td>2026-03-31</td><td>479,243</td><td>39.0</td><td>21.5</td></tr>
+<tr><td>2026-03-30</td><td>427,550</td><td>38.7</td><td>19.0</td></tr>
+<tr><td>2026-03-27</td><td>515,636</td><td>39.0</td><td>23.2</td></tr>
+<tr><td>2026-03-26</td><td>472,788</td><td>40.2</td><td>22.0</td></tr>
+<tr><td>2026-03-25</td><td>538,381</td><td>41.2</td><td>25.7</td></tr>
+<tr><td>2026-03-24</td><td>538,019</td><td>40.1</td><td>25.0</td></tr>
+<tr><td>2026-03-23</td><td>578,909</td><td>40.6</td><td>27.2</td></tr>
+<tr><td>2026-03-20</td><td>638,061</td><td>40.7</td><td>30.0</td></tr>
+<tr><td>2026-03-19</td><td>717,901</td><td>41.2</td><td>34.0</td></tr>
+<tr><td>2026-03-18</td><td>708,384</td><td>44.4</td><td>36.2</td></tr>
+<tr><td>2026-03-17</td><td>469,288</td><td>47.0</td><td>25.4</td></tr>
+<tr><td>2026-03-16</td><td>385,837</td><td>46.7</td><td>20.7</td></tr>
+<tr><td>2026-03-13</td><td>444,182</td><td>46.7</td><td>23.7</td></tr>
+<tr><td>2026-03-12</td><td>400,676</td><td>45.6</td><td>21.0</td></tr>
+<tr><td>2026-03-11</td><td>534,786</td><td>46.2</td><td>28.6</td></tr>
+<tr><td>2026-03-10</td><td>746,592</td><td>46.5</td><td>40.4</td></tr>
+<tr><td>2026-03-09</td><td>445,766</td><td>42.3</td><td>21.9</td></tr>
+<tr><td>2026-03-06</td><td>496,934</td><td>42.3</td><td>24.3</td></tr>
+<tr><td>2026-03-05</td><td>471,784</td><td>41.8</td><td>22.8</td></tr>
+<tr><td>2026-03-04</td><td>520,434</td><td>41.8</td><td>25.3</td></tr>
+<tr><td>2026-03-03</td><td>603,482</td><td>41.1</td><td>28.7</td></tr>
+<tr><td>2026-03-02</td><td>312,373</td><td>42.2</td><td>15.4</td></tr>
+<tr><td>2026-02-27</td><td>412,275</td><td>43.6</td><td>21.2</td></tr>
+<tr><td>2026-02-26</td><td>377,141</td><td>43.7</td><td>19.4</td></tr>
+<tr><td>2026-02-25</td><td>392,836</td><td>44.4</td><td>20.6</td></tr>
+<tr><td>2026-02-24</td><td>365,173</td><td>43.9</td><td>18.9</td></tr>
+<tr><td>2026-02-23</td><td>511,571</td><td>44.5</td><td>26.9</td></tr>
+<tr><td>2026-02-20</td><td>417,290</td><td>43.8</td><td>21.6</td></tr>
+<tr><td>2026-02-19</td><td>455,159</td><td>44.1</td><td>23.6</td></tr>
+<tr><td>2026-02-18</td><td>418,650</td><td>43.9</td><td>21.7</td></tr>
+<tr><td>2026-02-17</td><td>400,228</td><td>42.6</td><td>20.2</td></tr>
+<tr><td>2026-02-16</td><td>366,917</td><td>42.9</td><td>18.6</td></tr>
+<tr><td>2026-02-13</td><td>512,971</td><td>42.7</td><td>26.0</td></tr>
+<tr><td>2026-02-12</td><td>482,798</td><td>43.8</td><td>25.1</td></tr>
+<tr><td>2026-02-11</td><td>430,377</td><td>44.2</td><td>22.6</td></tr>
+<tr><td>2026-02-10</td><td>591,403</td><td>44.8</td><td>31.5</td></tr>
+<tr><td>2026-02-09</td><td>377,370</td><td>46.1</td><td>20.7</td></tr>
+<tr><td>2026-02-06</td><td>572,900</td><td>45.9</td><td>31.1</td></tr>
+<tr><td>2026-02-05</td><td>593,924</td><td>45.7</td><td>32.0</td></tr>
+<tr><td>2026-02-04</td><td>750,789</td><td>45.8</td><td>40.5</td></tr>
+<tr><td>2026-02-03</td><td>530,875</td><td>47.7</td><td>29.9</td></tr>
+<tr><td>2026-02-02</td><td>503,228</td><td>48.3</td><td>28.6</td></tr>
+<tr><td>2026-01-30</td><td>413,239</td><td>48.9</td><td>24.1</td></tr>
+<tr><td>2026-01-29</td><td>332,527</td><td>50.5</td><td>20.0</td></tr>
+<tr><td>2026-01-28</td><td>385,359</td><td>50.5</td><td>23.3</td></tr>
+<tr><td>2026-01-27</td><td>312,452</td><td>50.2</td><td>18.7</td></tr>
+<tr><td>2026-01-26</td><td>313,028</td><td>50.0</td><td>18.6</td></tr>
+<tr><td>2026-01-23</td><td>377,739</td><td>50.3</td><td>22.3</td></tr>
+<tr><td>2026-01-22</td><td>428,950</td><td>50.9</td><td>25.6</td></tr>
+<tr><td>2026-01-21</td><td>335,204</td><td>50.9</td><td>20.0</td></tr>
+<tr><td>2026-01-20</td><td>380,364</td><td>51.0</td><td>22.8</td></tr>
+<tr><td>2026-01-19</td><td>299,949</td><td>52.5</td><td>18.3</td></tr>
+<tr><td>2026-01-16</td><td>309,416</td><td>53.5</td><td>19.2</td></tr>
+<tr><td>2026-01-15</td><td>469,757</td><td>54.0</td><td>29.4</td></tr>
+<tr><td>2026-01-14</td><td>333,559</td><td>55.6</td><td>21.6</td></tr>
+<tr><td>2026-01-13</td><td>282,240</td><td>55.6</td><td>18.3</td></tr>
+<tr><td>2026-01-12</td><td>305,467</td><td>54.7</td><td>19.5</td></tr>
+<tr><td>2026-01-09</td><td>285,078</td><td>53.3</td><td>17.7</td></tr>
+<tr><td>2026-01-08</td><td>272,827</td><td>53.8</td><td>17.1</td></tr>
+<tr><td>2026-01-07</td><td>299,472</td><td>54.7</td><td>19.1</td></tr>
+<tr><td>2026-01-06</td><td>275,800</td><td>54.9</td><td>17.7</td></tr>
+<tr><td>2026-01-05</td><td>324,191</td><td>54.3</td><td>20.6</td></tr>
+<tr><td>2026-01-02</td><td>297,013</td><td>54.3</td><td>19.0</td></tr>
+<tr><td>2026-01-01</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>2025-12-31</td><td>128,432</td><td>52.6</td><td>7.9</td></tr>
+<tr><td>2025-12-30</td><td>256,527</td><td>53.0</td><td>16.0</td></tr>
+<tr><td>2025-12-29</td><td>92,770</td><td>52.7</td><td>5.7</td></tr>
+<tr><td>2025-12-26</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>2025-12-25</td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>2025-12-24</td><td>118,892</td><td>53.1</td><td>7.4</td></tr>
+<tr><td>2025-12-23</td><td>277,960</td><td>52.7</td><td>17.2</td></tr>
+<tr><td>2025-12-22</td><td>255,721</td><td>52.9</td><td>15.9</td></tr>
+<tr><td>2025-12-19</td><td>613,083</td><td>53.2</td><td>38.2</td></tr>
+<tr><td>2025-12-18</td><td>648,156</td><td>51.7</td><td>39.3</td></tr>
+<tr><td>2025-12-17</td><td>548,853</td><td>52.4</td><td>33.8</td></tr>
+<tr><td>2025-12-16</td><td>422,812</td><td>52.7</td><td>26.2</td></tr>
+<tr><td>2025-12-15</td><td>457,258</td><td>53.0</td><td>28.5</td></tr>
+<tr><td>2025-12-12</td><td>533,270</td><td>54.0</td><td>33.8</td></tr>
+<tr><td>2025-12-11</td><td>629,014</td><td>52.7</td><td>39.0</td></tr>
+<tr><td>2025-12-10</td><td>496,251</td><td>51.7</td><td>29.9</td></tr>
+<tr><td>2025-12-09</td><td>467,896</td><td>51.2</td><td>27.9</td></tr>
+<tr><td>2025-12-08</td><td>507,047</td><td>51.8</td><td>30.5</td></tr>
+<tr><td>2025-12-05</td><td>460,565</td><td>52.7</td><td>28.2</td></tr>
+<tr><td>2025-12-04</td><td>485,083</td><td>52.4</td><td>29.7</td></tr>
+<tr><td>2025-12-03</td><td>537,811</td><td>52.0</td><td>32.6</td></tr>
+<tr><td>2025-12-02</td><td>647,887</td><td>52.9</td><td>39.8</td></tr>
+<tr><td>2025-12-01</td><td>536,939</td><td>53.6</td><td>33.4</td></tr>
+<tr><td>2025-11-28</td><td>463,016</td><td>53.9</td><td>29.0</td></tr>
+<tr><td>2025-11-27</td><td>516,370</td><td>54.0</td><td>32.3</td></tr>
+<tr><td>2025-11-26</td><td>185,822</td><td>55.5</td><td>12.0</td></tr>
+<tr><td>2025-11-25</td><td>242,532</td><td>55.2</td><td>15.5</td></tr>
+<tr><td>2025-11-24</td><td>403,089</td><td>55.4</td><td>25.7</td></tr>
+<tr><td>2025-11-21</td><td>300,227</td><td>56.3</td><td>19.4</td></tr>
+<tr><td>2025-11-20</td><td>180,284</td><td>58.3</td><td>12.1</td></tr>
+<tr><td>2025-11-19</td><td>187,641</td><td>58.3</td><td>12.6</td></tr>
+<tr><td>2025-11-18</td><td>252,212</td><td>58.5</td><td>17.1</td></tr>
+<tr><td>2025-11-17</td><td>148,706</td><td>59.9</td><td>10.3</td></tr>
+<tr><td>2025-11-14</td><td>240,220</td><td>60.2</td><td>16.8</td></tr>
+<tr><td>2025-11-13</td><td>330,192</td><td>63.1</td><td>24.3</td></tr>
+<tr><td>2025-11-12</td><td>153,636</td><td>61.7</td><td>11.0</td></tr>
+<tr><td>2025-11-11</td><td>140,261</td><td>61.1</td><td>9.9</td></tr>
+<tr><td>2025-11-10</td><td>256,400</td><td>61.8</td><td>18.3</td></tr>
+<tr><td>2025-11-07</td><td>166,017</td><td>59.3</td><td>11.4</td></tr>
+<tr><td>2025-11-06</td><td>208,471</td><td>60.8</td><td>14.6</td></tr>
+<tr><td>2025-11-05</td><td>222,030</td><td>59.8</td><td>15.2</td></tr>
+<tr><td>2025-11-04</td><td>172,611</td><td>59.4</td><td>11.8</td></tr>
+<tr><td>2025-11-03</td><td>133,595</td><td>60.1</td><td>9.2</td></tr>
+<tr><td>2025-10-31</td><td>220,736</td><td>59.9</td><td>15.2</td></tr>
+<tr><td>2025-10-30</td><td>223,524</td><td>60.8</td><td>15.7</td></tr>
+<tr><td>2025-10-29</td><td>143,859</td><td>61.3</td><td>10.3</td></tr>
+<tr><td>2025-10-28</td><td>176,044</td><td>60.7</td><td>12.5</td></tr>
+<tr><td>2025-10-27</td><td>252,918</td><td>61.4</td><td>18.1</td></tr>
+<tr><td>2025-10-24</td><td>127,636</td><td>59.3</td><td>8.8</td></tr>
+<tr><td>2025-10-23</td><td>157,560</td><td>58.9</td><td>10.8</td></tr>
+<tr><td>2025-10-22</td><td>129,320</td><td>58.7</td><td>8.8</td></tr>
+<tr><td>2025-10-21</td><td>197,425</td><td>58.7</td><td>13.4</td></tr>
+<tr><td>2025-10-20</td><td>140,054</td><td>58.6</td><td>9.6</td></tr>
+<tr><td>2025-10-17</td><td>371,268</td><td>57.1</td><td>24.7</td></tr>
+<tr><td>2025-10-16</td><td>176,675</td><td>58.5</td><td>12.1</td></tr>
+<tr><td>2025-10-15</td><td>243,922</td><td>59.2</td><td>16.8</td></tr>
+<tr><td>2025-10-14</td><td>374,936</td><td>58.4</td><td>25.4</td></tr>
+<tr><td>2025-10-13</td><td>283,305</td><td>59.5</td><td>19.5</td></tr>
+<tr><td>2025-10-10</td><td>487,314</td><td>60.1</td><td>33.9</td></tr>
+<tr><td>2025-10-09</td><td>190,684</td><td>62.3</td><td>13.8</td></tr>
+<tr><td>2025-10-08</td><td>189,215</td><td>62.2</td><td>13.7</td></tr>
+<tr><td>2025-10-07</td><td>182,140</td><td>61.4</td><td>13.1</td></tr>
+<tr><td>2025-10-06</td><td>215,050</td><td>61.6</td><td>15.5</td></tr>
+<tr><td>2025-10-03</td><td>288,629</td><td>61.8</td><td>20.9</td></tr>
+<tr><td>2025-10-02</td><td>245,677</td><td>61.4</td><td>17.7</td></tr>
+<tr><td>2025-10-01</td><td>291,521</td><td>60.3</td><td>20.6</td></tr>
+<tr><td>2025-09-30</td><td>331,128</td><td>60.0</td><td>23.3</td></tr>
+<tr><td>2025-09-29</td><td>322,324</td><td>59.6</td><td>22.5</td></tr>
+<tr><td>2025-09-26</td><td>300,856</td><td>58.0</td><td>20.4</td></tr>
+<tr><td>2025-09-25</td><td>334,930</td><td>58.0</td><td>22.7</td></tr>
+<tr><td>2025-09-24</td><td>197,660</td><td>58.1</td><td>13.5</td></tr>
+<tr><td>2025-09-23</td><td>363,127</td><td>57.0</td><td>24.4</td></tr>
+<tr><td>2025-09-22</td><td>379,462</td><td>56.9</td><td>25.4</td></tr>
+<tr><td>2025-09-19</td><td>415,471</td><td>56.8</td><td>27.8</td></tr>
+<tr><td>2025-09-18</td><td>575,716</td><td>56.2</td><td>38.1</td></tr>
+<tr><td>2025-09-17</td><td>374,835</td><td>56.0</td><td>24.9</td></tr>
+<tr><td>2025-09-16</td><td>342,578</td><td>55.0</td><td>22.3</td></tr>
+<tr><td>2025-09-15</td><td>359,089</td><td>55.0</td><td>23.2</td></tr>
+<tr><td>2025-09-12</td><td>258,355</td><td>54.7</td><td>16.6</td></tr>
+<tr><td>2025-09-11</td><td>290,937</td><td>54.1</td><td>18.5</td></tr>
+<tr><td>2025-09-10</td><td>314,821</td><td>53.8</td><td>19.9</td></tr>
+<tr><td>2025-09-09</td><td>212,413</td><td>53.4</td><td>13.3</td></tr>
+<tr><td>2025-09-08</td><td>141,096</td><td>52.8</td><td>8.7</td></tr>
+<tr><td>2025-09-05</td><td>248,409</td><td>52.6</td><td>15.3</td></tr>
+<tr><td>2025-09-04</td><td>255,898</td><td>52.0</td><td>15.5</td></tr>
+<tr><td>2025-09-03</td><td>303,941</td><td>51.9</td><td>18.4</td></tr>
+<tr><td>2025-09-02</td><td>240,490</td><td>51.5</td><td>14.4</td></tr>
+<tr><td>2025-09-01</td><td>135,072</td><td>52.8</td><td>8.3</td></tr>
+<tr><td>2025-08-29</td><td>253,208</td><td>52.7</td><td>15.6</td></tr>
+<tr><td>2025-08-28</td><td>258,089</td><td>52.2</td><td>15.7</td></tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  </div>
+
+</div>
+
+<div class="footer">
+  Data source: Tencent & Prosus Buyback Tracker | Generated: 2026-06-12 16:17
+</div>
+
+</body>
+</html>
