@@ -146,6 +146,19 @@
   .blue { color: var(--accent-blue); }
   .orange { color: var(--accent-orange); }
 
+  /* FX rate footnote */
+  .fx-note {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-style: italic;
+    margin: -12px 0 24px 0;
+    padding: 8px 12px;
+    background: rgba(79, 143, 247, 0.04);
+    border-radius: 6px;
+    border: 1px dashed var(--card-border);
+  }
+
   /* Section */
   .section {
     background: var(--card-bg);
@@ -264,14 +277,27 @@
       <div class="kpi-card">
         <div class="kpi-label">Tencent 2026 YTD Avg Daily Run Rate</div>
         <div class="kpi-value negative">HKD 502.2 mn/day</div>
-        <div class="kpi-sub">51 BB days | -20.3% vs 2025 same period (58 days)</div>
+        <div class="kpi-sub">USD 64.4 mn/day &middot; 51 BB days | -20.3% vs 2025 (58 days)</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Implied 2026 Total Buyback</div>
+        <div class="kpi-label">Implied 2026 Total Buyback (Tencent)</div>
         <div class="kpi-value negative">HKD 65.3 bn</div>
-        <div class="kpi-sub">-16.9% vs 2025 actual (based on 130 BB days)</div>
+        <div class="kpi-sub">USD 8.4 bn &middot; -16.9% vs 2025 (130 BB days)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Prosus 2026 YTD Avg Daily Run Rate</div>
+        <div class="kpi-value negative">USD 22.2 mn/day</div>
+        <div class="kpi-sub">130 BB days | -54.1% vs 2025 (130 days)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Implied 2026 Total Buyback (Prosus)</div>
+        <div class="kpi-value negative">USD 5.7 bn</div>
+        <div class="kpi-sub">-9.9% vs 2025 (based on 255 BB days)</div>
       </div>
     </div>
+
+    <!-- FX rate footnote -->
+    <div class="fx-note">HKD values converted at USD/HKD = 7.8 (fixed rate, for display only). Prosus figures are reported in USD directly.</div>
 
     <!-- Yearly Comparison Bar Chart -->
     <div class="section">
@@ -817,7 +843,7 @@
 </div>
 
 <div class="footer">
-  Data source: Tencent & Prosus Buyback Tracker | Generated: 2026-07-08 09:54
+  Data source: Tencent & Prosus Buyback Tracker | Generated: 2026-07-08 16:49
 </div>
 
 </body>
