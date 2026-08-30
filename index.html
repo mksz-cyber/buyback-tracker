@@ -97,13 +97,15 @@
   /* When tab0 checked → show page0, activate label0 */
   #tab0:checked ~ .page-nav label[for="tab0"],
   #tab1:checked ~ .page-nav label[for="tab1"],
-  #tab2:checked ~ .page-nav label[for="tab2"] {
+  #tab2:checked ~ .page-nav label[for="tab2"],
+  #tab3:checked ~ .page-nav label[for="tab3"] {
     background: var(--accent-blue);
     color: white;
   }
   #tab0:checked ~ .pages .page0,
   #tab1:checked ~ .pages .page1,
-  #tab2:checked ~ .pages .page2 {
+  #tab2:checked ~ .pages .page2,
+  #tab3:checked ~ .pages .page3 {
     display: block;
   }
 
@@ -255,11 +257,13 @@
   <input type="radio" name="tab" id="tab0" class="tab-radio" checked>
   <input type="radio" name="tab" id="tab1" class="tab-radio">
   <input type="radio" name="tab" id="tab2" class="tab-radio">
+  <input type="radio" name="tab" id="tab3" class="tab-radio">
 
   <div class="page-nav">
     <label for="tab0" class="tab-label">Summary</label>
     <label for="tab1" class="tab-label">Tencent Details</label>
     <label for="tab2" class="tab-label">Prosus Details</label>
+    <label for="tab3" class="tab-label">Quarterly Shareholding</label>
   </div>
 
   <div class="pages">
@@ -843,12 +847,59 @@
     </div>
   </div>
 
+  <!-- ========== PAGE 4: QUARTERLY SHAREHOLDING ========== -->
+  <div class="page page3">
+    <div class="section">
+      <div class="section-title">Prosus Quarterly Tencent Shareholding (Dec 24 - Jun 26)</div>
+      <div class="chart-container" style="height:420px;">
+        <svg viewBox="0 0 1100 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+  <!-- Left Y-axis grid -->
+  <line x1="70" y1="370.0" x2="1030" y2="370.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="370.0" text-anchor="end" fill="#8ab8ff" font-size="11" dominant-baseline="middle">2000</text><line x1="70" y1="304.0" x2="1030" y2="304.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="304.0" text-anchor="end" fill="#8ab8ff" font-size="11" dominant-baseline="middle">2052</text><line x1="70" y1="238.0" x2="1030" y2="238.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="238.0" text-anchor="end" fill="#8ab8ff" font-size="11" dominant-baseline="middle">2104</text><line x1="70" y1="172.0" x2="1030" y2="172.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="172.0" text-anchor="end" fill="#8ab8ff" font-size="11" dominant-baseline="middle">2156</text><line x1="70" y1="106.0" x2="1030" y2="106.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="106.0" text-anchor="end" fill="#8ab8ff" font-size="11" dominant-baseline="middle">2208</text><line x1="70" y1="40.0" x2="1030" y2="40.0" stroke="#2a2d3a" stroke-width="0.5"/><text x="62" y="40.0" text-anchor="end" fill="#8ab8ff" font-size="11" dominant-baseline="middle">2260</text>
+
+  <!-- Axes -->
+  <line x1="70" y1="40" x2="70" y2="370" stroke="#2a2d3a" stroke-width="0.5"/>
+  <line x1="70" y1="370" x2="1030" y2="370" stroke="#2a2d3a" stroke-width="0.5"/>
+  <line x1="1030" y1="40" x2="1030" y2="370" stroke="#2a2d3a" stroke-width="0.5"/>
+
+  <!-- Bars (Shares Held) -->
+  <rect x="41.2" y="97.3" width="57.6" height="272.7" rx="3" ry="3" fill="#4f8ff7"/><rect x="201.2" y="163.2" width="57.6" height="206.8" rx="3" ry="3" fill="#4f8ff7"/><rect x="361.2" y="227.2" width="57.6" height="142.8" rx="3" ry="3" fill="#4f8ff7"/><rect x="521.2" y="253.0" width="57.6" height="117.0" rx="3" ry="3" fill="#4f8ff7"/><rect x="681.2" y="269.1" width="57.6" height="100.9" rx="3" ry="3" fill="#4f8ff7"/><rect x="841.2" y="284.5" width="57.6" height="85.5" rx="3" ry="3" fill="#4f8ff7"/><rect x="1001.2" y="299.9" width="57.6" height="70.1" rx="3" ry="3" fill="#4f8ff7"/>
+
+  <!-- Bar value labels -->
+  <text x="70.0" y="89.3" text-anchor="middle" fill="#8ab8ff" font-size="11" font-weight="600">2,215</text><text x="230.0" y="155.2" text-anchor="middle" fill="#8ab8ff" font-size="11" font-weight="600">2,163</text><text x="390.0" y="219.2" text-anchor="middle" fill="#8ab8ff" font-size="11" font-weight="600">2,112</text><text x="550.0" y="245.0" text-anchor="middle" fill="#8ab8ff" font-size="11" font-weight="600">2,092</text><text x="710.0" y="261.1" text-anchor="middle" fill="#8ab8ff" font-size="11" font-weight="600">2,080</text><text x="870.0" y="276.5" text-anchor="middle" fill="#8ab8ff" font-size="11" font-weight="600">2,067</text><text x="1030.0" y="291.9" text-anchor="middle" fill="#8ab8ff" font-size="11" font-weight="600">2,055</text>
+
+  <!-- Quarterly reduction dashed line + markers + labels -->
+  <polyline points="230.0,84.6 390.0,92.3 550.0,258.2 710.0,300.5 870.0,303.4 1030.0,303.1" fill="none" stroke="#f87171" stroke-width="2" stroke-dasharray="6,4" stroke-linejoin="round"/>
+  <rect x="225.0" y="79.6" width="10" height="10" fill="#f87171"/><rect x="385.0" y="87.3" width="10" height="10" fill="#f87171"/><rect x="545.0" y="253.2" width="10" height="10" fill="#f87171"/><rect x="705.0" y="295.5" width="10" height="10" fill="#f87171"/><rect x="865.0" y="298.4" width="10" height="10" fill="#f87171"/><rect x="1025.0" y="298.1" width="10" height="10" fill="#f87171"/>
+  <text x="230.0" y="72.6" text-anchor="middle" fill="#f87171" font-size="11" font-weight="700">-52</text><text x="390.0" y="80.3" text-anchor="middle" fill="#f87171" font-size="11" font-weight="700">-50</text><text x="550.0" y="246.2" text-anchor="middle" fill="#f87171" font-size="11" font-weight="700">-20</text><text x="710.0" y="288.5" text-anchor="middle" fill="#f87171" font-size="11" font-weight="700">-13</text><text x="870.0" y="291.4" text-anchor="middle" fill="#f87171" font-size="11" font-weight="700">-12</text><text x="1030.0" y="291.1" text-anchor="middle" fill="#f87171" font-size="11" font-weight="700">-12</text>
+
+  <!-- Right Y-axis labels -->
+  <text x="1038" y="370.0" text-anchor="start" fill="#f87171" font-size="11" dominant-baseline="middle">0</text><text x="1038" y="315.0" text-anchor="start" fill="#f87171" font-size="11" dominant-baseline="middle">10</text><text x="1038" y="260.0" text-anchor="start" fill="#f87171" font-size="11" dominant-baseline="middle">20</text><text x="1038" y="205.0" text-anchor="start" fill="#f87171" font-size="11" dominant-baseline="middle">30</text><text x="1038" y="150.0" text-anchor="start" fill="#f87171" font-size="11" dominant-baseline="middle">40</text><text x="1038" y="95.0" text-anchor="start" fill="#f87171" font-size="11" dominant-baseline="middle">50</text><text x="1038" y="40.0" text-anchor="start" fill="#f87171" font-size="11" dominant-baseline="middle">60</text>
+
+  <!-- X-axis labels -->
+  <text x="70.0" y="390" text-anchor="middle" fill="#8b8fa3" font-size="11">Dec 24</text><text x="230.0" y="390" text-anchor="middle" fill="#8b8fa3" font-size="11">Mar 25</text><text x="390.0" y="390" text-anchor="middle" fill="#8b8fa3" font-size="11">Jun 25</text><text x="550.0" y="390" text-anchor="middle" fill="#8b8fa3" font-size="11">Sep 25</text><text x="710.0" y="390" text-anchor="middle" fill="#8b8fa3" font-size="11">Dec 25</text><text x="870.0" y="390" text-anchor="middle" fill="#8b8fa3" font-size="11">Mar 26</text><text x="1030.0" y="390" text-anchor="middle" fill="#8b8fa3" font-size="11">Jun 26</text>
+
+  <!-- Y-axis titles -->
+  <text x="16" y="210.0" text-anchor="middle" fill="#8ab8ff" font-size="10" transform="rotate(-90 16 210.0)">Shares Held (million)</text>
+  <text x="1080" y="210.0" text-anchor="middle" fill="#f87171" font-size="10" transform="rotate(90 1080 210.0)">Quarterly Reduction (million)</text>
+
+  <!-- Legend -->
+  <rect x="70" y="8" width="12" height="12" rx="2" fill="#4f8ff7"/>
+  <text x="88" y="18" fill="#e4e6ef" font-size="11">Shares Held (million)</text>
+  <line x1="248" y1="14" x2="276" y2="14" stroke="#f87171" stroke-width="2" stroke-dasharray="6,4"/>
+  <rect x="258" y="9" width="10" height="10" fill="#f87171"/>
+  <text x="282" y="18" fill="#e4e6ef" font-size="11">Quarterly Reduction (million)</text>
+</svg>
+      </div>
+    </div>
+    <div class="fx-note">Published once per quarter (source: Prosus quarterly NAV consensus workbook, "Tencent — Shares held" row). This is a quarterly series, distinct from the daily "Tencent shares held" column tracked in the NAV Discount sheet. Quarterly Reduction = quarter-over-quarter decline in Tencent shares held by Prosus.</div>
+  </div>
+
   </div>
 
 </div>
 
 <div class="footer">
-  Data source: Tencent & Prosus Buyback Tracker | Generated: 2026-08-29 18:49
+  Data source: Tencent & Prosus Buyback Tracker | Generated: 2026-08-30 13:07
 </div>
 
 </body>
