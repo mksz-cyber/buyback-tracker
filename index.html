@@ -874,8 +874,8 @@
   <!-- Bars (Shares Held) -->
   <rect x="79.6" y="77.3" width="28.8" height="332.7" rx="3" ry="3" fill="#4f8ff7"/><rect x="127.6" y="77.3" width="28.8" height="332.7" rx="3" ry="3" fill="#4f8ff7"/><rect x="175.6" y="77.3" width="28.8" height="332.7" rx="3" ry="3" fill="#4f8ff7"/><rect x="223.6" y="79.0" width="28.8" height="331.0" rx="3" ry="3" fill="#4f8ff7"/><rect x="271.6" y="118.2" width="28.8" height="291.8" rx="3" ry="3" fill="#4f8ff7"/><rect x="319.6" y="160.4" width="28.8" height="249.6" rx="3" ry="3" fill="#4f8ff7"/><rect x="367.6" y="193.0" width="28.8" height="217.0" rx="3" ry="3" fill="#4f8ff7"/><rect x="415.6" y="215.5" width="28.8" height="194.5" rx="3" ry="3" fill="#4f8ff7"/><rect x="463.6" y="233.0" width="28.8" height="177.0" rx="3" ry="3" fill="#4f8ff7"/><rect x="511.6" y="251.3" width="28.8" height="158.7" rx="3" ry="3" fill="#4f8ff7"/><rect x="559.6" y="270.0" width="28.8" height="140.0" rx="3" ry="3" fill="#4f8ff7"/><rect x="607.6" y="286.7" width="28.8" height="123.3" rx="3" ry="3" fill="#4f8ff7"/><rect x="655.6" y="300.5" width="28.8" height="109.5" rx="3" ry="3" fill="#4f8ff7"/><rect x="703.6" y="317.1" width="28.8" height="92.9" rx="3" ry="3" fill="#4f8ff7"/><rect x="751.6" y="339.5" width="28.8" height="70.5" rx="3" ry="3" fill="#4f8ff7"/><rect x="799.6" y="361.4" width="28.8" height="48.6" rx="3" ry="3" fill="#4f8ff7"/><rect x="847.6" y="370.1" width="28.8" height="39.9" rx="3" ry="3" fill="#4f8ff7"/><rect x="895.6" y="375.6" width="28.8" height="34.4" rx="3" ry="3" fill="#4f8ff7"/><rect x="943.6" y="380.9" width="28.8" height="29.1" rx="3" ry="3" fill="#4f8ff7"/><rect x="991.6" y="386.1" width="28.8" height="23.9" rx="3" ry="3" fill="#4f8ff7"/>
 
-  <!-- Quarterly reduction dashed line + markers（先于文字绘制，标签在最上层不会被遮挡） -->
-  <polyline points="142.0,410.0 190.0,410.0 238.0,396.5 286.0,96.0 334.0,72.7 382.0,148.8 430.0,230.4 478.0,269.9 526.0,263.2 574.0,261.1 622.0,275.9 670.0,299.9 718.0,277.3 766.0,230.4 814.0,235.3 862.0,339.6 910.0,366.3 958.0,368.1 1006.0,367.9" fill="none" stroke="#f87171" stroke-width="2" stroke-dasharray="6,4" stroke-linejoin="round"/>
+  <!-- Quarterly reduction dashed line + markers（先于文字绘制；零减持季断开不画线） -->
+  <path d="M 238.0 396.5 L 286.0 96.0 L 334.0 72.7 L 382.0 148.8 L 430.0 230.4 L 478.0 269.9 L 526.0 263.2 L 574.0 261.1 L 622.0 275.9 L 670.0 299.9 L 718.0 277.3 L 766.0 230.4 L 814.0 235.3 L 862.0 339.6 L 910.0 366.3 L 958.0 368.1 L 1006.0 367.9" fill="none" stroke="#f87171" stroke-width="2" stroke-dasharray="6,4" stroke-linejoin="round" stroke-linecap="round"/>
   <rect x="233.0" y="391.5" width="10" height="10" fill="#f87171"/><rect x="281.0" y="91.0" width="10" height="10" fill="#f87171"/><rect x="329.0" y="67.7" width="10" height="10" fill="#f87171"/><rect x="377.0" y="143.8" width="10" height="10" fill="#f87171"/><rect x="425.0" y="225.4" width="10" height="10" fill="#f87171"/><rect x="473.0" y="264.9" width="10" height="10" fill="#f87171"/><rect x="521.0" y="258.2" width="10" height="10" fill="#f87171"/><rect x="569.0" y="256.1" width="10" height="10" fill="#f87171"/><rect x="617.0" y="270.9" width="10" height="10" fill="#f87171"/><rect x="665.0" y="294.9" width="10" height="10" fill="#f87171"/><rect x="713.0" y="272.3" width="10" height="10" fill="#f87171"/><rect x="761.0" y="225.4" width="10" height="10" fill="#f87171"/><rect x="809.0" y="230.3" width="10" height="10" fill="#f87171"/><rect x="857.0" y="334.6" width="10" height="10" fill="#f87171"/><rect x="905.0" y="361.3" width="10" height="10" fill="#f87171"/><rect x="953.0" y="363.1" width="10" height="10" fill="#f87171"/><rect x="1001.0" y="362.9" width="10" height="10" fill="#f87171"/>
 
   <!-- Bar value labels -->
@@ -954,7 +954,7 @@
 </div>
 
 <div class="footer">
-  Data source: Tencent & Prosus Buyback Tracker | Generated: 2026-08-30 18:22
+  Data source: Tencent & Prosus Buyback Tracker | Generated: 2026-08-30 18:40
 </div>
 
 </body>
