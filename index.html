@@ -98,15 +98,78 @@
   #tab0:checked ~ .page-nav label[for="tab0"],
   #tab1:checked ~ .page-nav label[for="tab1"],
   #tab2:checked ~ .page-nav label[for="tab2"],
-  #tab3:checked ~ .page-nav label[for="tab3"] {
+  #tab3:checked ~ .page-nav label[for="tab3"],
+  #tab4:checked ~ .page-nav label[for="tab4"] {
     background: var(--accent-blue);
     color: white;
   }
   #tab0:checked ~ .pages .page0,
   #tab1:checked ~ .pages .page1,
   #tab2:checked ~ .pages .page2,
-  #tab3:checked ~ .pages .page3 {
+  #tab3:checked ~ .pages .page3,
+  #tab4:checked ~ .pages .page4 {
     display: block;
+  }
+
+  /* Tencent Daily Quote cards (page4) */
+  .quote-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .quote-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 16px 20px;
+  }
+  .quote-card-alert {
+    border-color: var(--accent-orange);
+    background: rgba(251, 146, 60, 0.08);
+    box-shadow: 0 0 0 1px rgba(251, 146, 60, 0.25);
+  }
+  .quote-card-date {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .quote-line {
+    font-size: 13px;
+    color: var(--text);
+    padding: 2px 0;
+    line-height: 1.5;
+  }
+  .quote-note {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--card-border);
+    padding-top: 8px;
+  }
+  .quote-alert-badge {
+    display: inline-block;
+    background: rgba(251, 146, 60, 0.15);
+    color: var(--accent-orange);
+    border: 1px solid rgba(251, 146, 60, 0.4);
+    padding: 1px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 6px;
+  }
+  .quote-placeholder {
+    padding: 32px;
+    text-align: center;
+    color: var(--text-muted);
+    background: var(--card-bg);
+    border: 1px dashed var(--card-border);
+    border-radius: 12px;
+    font-size: 13px;
   }
 
   /* KPI Cards */
@@ -245,7 +308,7 @@
   <div class="header-inner">
     <div>
       <h1>Tencent & Prosus Buyback Tracker</h1>
-      <div class="subtitle">Daily Summary Dashboard | Updated: 2026-09-21</div>
+      <div class="subtitle">Daily Summary Dashboard | Updated: 2026-09-22</div>
     </div>
     <div class="update-badge">Live</div>
   </div>
@@ -258,12 +321,14 @@
   <input type="radio" name="tab" id="tab1" class="tab-radio">
   <input type="radio" name="tab" id="tab2" class="tab-radio">
   <input type="radio" name="tab" id="tab3" class="tab-radio">
+  <input type="radio" name="tab" id="tab4" class="tab-radio">
 
   <div class="page-nav">
     <label for="tab0" class="tab-label">Summary</label>
     <label for="tab1" class="tab-label">Tencent Details</label>
     <label for="tab2" class="tab-label">Prosus Details</label>
     <label for="tab3" class="tab-label">Prosus Quarterly Tencent Shareholding</label>
+    <label for="tab4" class="tab-label">Tencent Daily Quote</label>
   </div>
 
   <div class="pages">
@@ -274,24 +339,24 @@
     <!-- KPI 1: Last Trading Day BB -->
     <div class="kpi-grid">
       <div class="kpi-card">
-        <div class="kpi-label">Tencent Last Buyback (2026-09-21)</div>
-        <div class="kpi-value blue">HKD 100.5 mn</div>
+        <div class="kpi-label">Tencent Last Buyback (2026-09-22)</div>
+        <div class="kpi-value blue">HKD 100.3 mn</div>
         <div class="kpi-sub">USD 12.8 mn</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Tencent 2026 YTD Avg Daily Run Rate</div>
-        <div class="kpi-value negative">HKD 389.1 mn/day</div>
-        <div class="kpi-sub">USD 49.9 mn/day &middot; 79 BB days | -37.1% vs 2025 (87 days)</div>
+        <div class="kpi-value negative">HKD 385.5 mn/day</div>
+        <div class="kpi-sub">USD 49.4 mn/day &middot; 80 BB days | -37.6% vs 2025 (88 days)</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Cumulative Tencent 2026 YTD BuyBack</div>
-        <div class="kpi-value negative">HKD 30.7 bn</div>
-        <div class="kpi-sub">USD 3,928.2 mn &middot; -42.9% vs 2025 (HKD 53.8 bn)</div>
+        <div class="kpi-value negative">HKD 30.8 bn</div>
+        <div class="kpi-sub">USD 3,941.0 mn &middot; -43.3% vs 2025 (HKD 54.4 bn)</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Implied 2026 Total Buyback (Tencent)</div>
-        <div class="kpi-value negative">HKD 50.6 bn</div>
-        <div class="kpi-sub">USD 6.5 bn &middot; -36.8% vs 2025 (130 BB days)</div>
+        <div class="kpi-value negative">HKD 50.1 bn</div>
+        <div class="kpi-sub">USD 6.4 bn &middot; -37.4% vs 2025 (130 BB days)</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Prosus 2026 YTD Avg Daily Run Rate</div>
@@ -310,8 +375,8 @@
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Prosus vs Tencent Implied 2026</div>
-        <div class="kpi-value">USD 5.3 bn / USD 6.5 bn</div>
-        <div class="kpi-sub">Prosus -18.0% vs Tencent</div>
+        <div class="kpi-value">USD 5.3 bn / USD 6.4 bn</div>
+        <div class="kpi-sub">Prosus -16.7% vs Tencent</div>
       </div>
     </div>
 
@@ -433,7 +498,8 @@
             <tr><th>Date</th><th>Shares</th><th>High (HKD)</th><th>Low (HKD)</th><th>Total (HKD mn)</th><th>Total (USD mn)</th></tr>
           </thead>
           <tbody>
-            <tr><td>2026-09-21</td><td>235,000</td><td>434.2</td><td>423.2</td><td>100.5</td><td>12.8</td></tr>
+            <tr><td>2026-09-22</td><td>223,000</td><td>450.8</td><td>442.8</td><td>100.3</td><td>12.8</td></tr>
+<tr><td>2026-09-21</td><td>235,000</td><td>434.2</td><td>423.2</td><td>100.5</td><td>12.8</td></tr>
 <tr><td>2026-09-18</td><td>237,000</td><td>430.2</td><td>425.2</td><td>100.5</td><td>12.8</td></tr>
 <tr><td>2026-09-17</td><td>235,000</td><td>431.0</td><td>425.2</td><td>100.3</td><td>12.8</td></tr>
 <tr><td>2026-09-16</td><td>231,000</td><td>438.8</td><td>432.8</td><td>100.5</td><td>12.8</td></tr>
@@ -632,7 +698,6 @@
 <tr><td>2025-03-25</td><td>989,000</td><td>515.0</td><td>501.5</td><td>500.5</td><td>64.4</td></tr>
 <tr><td>2025-03-24</td><td>980,000</td><td>517.5</td><td>505.0</td><td>500.5</td><td>64.4</td></tr>
 <tr><td>2025-01-16</td><td>3,930,000</td><td>386.4</td><td>376.8</td><td>1,500.1</td><td>193.2</td></tr>
-<tr><td>2025-01-15</td><td>3,960,000</td><td>385.2</td><td>373.2</td><td>1,503.4</td><td>193.7</td></tr>
 
           </tbody>
         </table>
@@ -949,12 +1014,72 @@
     <div class="fx-note">Published once per quarter (sources: Prosus quarterly NAV consensus workbook for shares held; Tencent "Monthly Return of Equity Issuer" for quarter-end shares outstanding). Ownership % = Tencent shares held ÷ Tencent shares outstanding (quarter-end). This quarterly series is distinct from the daily "Tencent shares held" column in the NAV Discount sheet. Quarterly Reduction = quarter-over-quarter decline in Tencent shares held by Prosus; zero-reduction quarters are not annotated.</div>
   </div>
 
+  <!-- ========== PAGE 5: TENCENT DAILY QUOTE ========== -->
+  <div class="page page4">
+<div class="section">
+    <div class="section-title">Tencent Daily Quote &mdash; Last 30 Trading Days</div>
+    <div id="quote-container" class="quote-list">
+      <div class="quote-placeholder">Loading daily quote data&hellip;</div>
+    </div>
+    <div class="fx-note">Daily quote messages are exported by the tracker pipeline to quote_data.json and fetched by this page at view time. Cards are shown newest first; highlighted cards mark alert days.</div>
+  </div>
+  <script>
+  (function () {
+    var cont = document.getElementById('quote-container');
+    function esc(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+    function fmt(line) {
+      var t = esc(line);
+      t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      if (t.indexOf('- ') === 0) { t = t.slice(2); }
+      return t;
+    }
+    function show(msg) {
+      cont.innerHTML = '<div class="quote-placeholder">' + esc(msg) + '</div>';
+    }
+    fetch('quote_data.json', { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) { throw new Error('HTTP ' + r.status); } return r.json(); })
+      .then(function (data) {
+        var hist = (data && data.history) || [];
+        if (!hist.length) { show('No daily quote history available yet.'); return; }
+        hist = hist.slice().sort(function (a, b) {
+          return a.date < b.date ? 1 : (a.date > b.date ? -1 : 0);
+        }).slice(0, 30);
+        var out = '';
+        for (var i = 0; i < hist.length; i++) {
+          var rec = hist[i] || {};
+          var lines = rec.lines || [];
+          out += '<div class="quote-card' + (rec.alert ? ' quote-card-alert' : '') + '">';
+          out += '<div class="quote-card-date">' + esc(rec.date || '') + (rec.alert ? ' <span class="quote-alert-badge">Alert</span>' : '') + '</div>';
+          out += '<div class="quote-card-body">';
+          for (var j = 0; j < lines.length; j++) {
+            out += '<div class="quote-line">' + fmt(lines[j]) + '</div>';
+          }
+          if (rec.note) {
+            out += '<div class="quote-note">' + fmt(rec.note) + '</div>';
+          }
+          out += '</div></div>';
+        }
+        cont.innerHTML = out;
+      })
+      .catch(function () {
+        show('Daily quote data unavailable (quote_data.json not found or unreadable).');
+      });
+  })();
+  </script>
+  </div>
+
   </div>
 
 </div>
 
 <div class="footer">
-  Data source: Tencent & Prosus Buyback Tracker | Generated: 2026-09-21 18:11
+  Data source: Tencent & Prosus Buyback Tracker | Generated: 2026-09-22 18:13
 </div>
 
 </body>
