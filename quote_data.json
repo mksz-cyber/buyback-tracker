@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-10-07T17:59:22+08:00",
+  "updated_at": "2026-10-09T18:07:44+08:00",
   "history": [
     {
       "date": "2026-09-22",
@@ -217,6 +217,25 @@
         "*Note:* Southbound turnover —: no southbound trading on this date; the HKEX Top-10 tables are blank (mainland market holiday).",
         "",
         "*Note:* Buyback YTD (mn USD) is through 2026-10-02 — the latest Prosus buyback disclosure date; Tencent is totalled to the same date. % is Tencent relative to Prosus."
+      ],
+      "note": null,
+      "alert": null
+    },
+    {
+      "date": "2026-10-09",
+      "lines": [
+        "**Tencent 700.HK · Daily Market Data**",
+        "2026-10-09 (Friday)",
+        "",
+        "- **Close (HKD)** · 424.8 (+3.3% DoD)",
+        "- **Volume (mn shares)** · 20.4",
+        "- **Turnover (mn HKD)** · 8,610",
+        "- **Southbound Turnover (mn HKD)** · 3,628 (42.1% of total; net sell: 259 mn)",
+        "- **Short Selling (% of Volume)** · 11.5%",
+        "- **Buyback Amount (mn HKD)** · 101 (1.2% of Turnover)",
+        "- **Tencent vs Prosus Buyback YTD (mn USD)** · 4,031 vs 4,031 (-0.0%)",
+        "",
+        "*Note:* YTD: through 2026-10-02 (latest Prosus disclosure); % = Tencent vs Prosus."
       ],
       "note": null,
       "alert": null
