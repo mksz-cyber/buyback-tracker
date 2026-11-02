@@ -119,6 +119,24 @@
     flex-direction: column;
     gap: 12px;
   }
+  /* "行情截至"徽标：quote_data.json 与看板不同日时变橙，避免静默滞后 */
+  .quote-asof {
+    display: inline-block;
+    margin: 0 0 14px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    letter-spacing: .01em;
+    background: rgba(139, 143, 163, 0.16);
+    color: var(--text-muted);
+    border: 1px solid var(--card-border);
+  }
+  .quote-asof-stale {
+    background: rgba(251, 146, 60, 0.16);
+    color: var(--accent-orange);
+    border-color: rgba(251, 146, 60, 0.45);
+    font-weight: 600;
+  }
   .quote-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
@@ -1022,6 +1040,7 @@
   <div class="page page4">
 <div class="section">
     <div class="section-title">Tencent Daily Quote &mdash; Last 30 Trading Days</div>
+    <div id="quote-asof" class="quote-asof">Quote as of &hellip;</div>
     <div id="quote-container" class="quote-list">
       <div class="quote-placeholder">Loading daily quote data&hellip;</div>
     </div>
@@ -1054,6 +1073,38 @@
         hist = hist.slice().sort(function (a, b) {
           return a.date < b.date ? 1 : (a.date > b.date ? -1 : 0);
         }).slice(0, 30);
+
+        // "Quote as of" 徽标：与看板 footer 的 Generated 日期比对，不同日就标橙。
+        // 目的：quote_data.json 由另一条流水线（17:28 行情任务）产出，推送漏掉时页面
+        // 会静默停留在旧日期 —— 有了这个徽标，读者自己就能看出滞后。
+        (function (newest) {
+          var el = document.getElementById('quote-asof');
+          if (!el) { return; }
+          var foot = document.querySelector('.footer');
+          var m = foot ? (foot.textContent || '').match(/Generated:\s*(\d{4}-\d{2}-\d{2})/) : null;
+          var dash = m ? m[1] : '';
+          if (!dash) {
+            el.textContent = 'Quote as of ' + newest;
+            return;
+          }
+          if (newest === dash) {
+            el.textContent = 'Quote as of ' + newest + ' | same day as this dashboard';
+            return;
+          }
+          var t1 = Date.parse(newest + 'T00:00:00Z');
+          var t2 = Date.parse(dash + 'T00:00:00Z');
+          var gap = (isFinite(t1) && isFinite(t2)) ? Math.round((t2 - t1) / 86400000) : null;
+          var tail;
+          if (gap === null) {
+            tail = 'dashboard is dated ' + dash;
+          } else if (gap > 0) {
+            tail = 'WARNING: ' + gap + ' day(s) behind this dashboard (' + dash + ')';
+          } else {
+            tail = 'newer than this dashboard (' + dash + ')';
+          }
+          el.textContent = 'Quote as of ' + newest + ' | ' + tail;
+          el.className = 'quote-asof quote-asof-stale';
+        })(hist[0].date || '');
         var out = '';
         for (var i = 0; i < hist.length; i++) {
           var rec = hist[i] || {};
@@ -1144,7 +1195,7 @@
 </div>
 
 <div class="footer">
-  Data source: Tencent & Prosus Buyback Tracker | Generated: 2026-11-02 17:53
+  Data source: Tencent & Prosus Buyback Tracker | Generated: 2026-11-02 17:59
 </div>
 
 </body>
