@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated_at": "2026-11-02T17:32:00+08:00",
+  "updated_at": "2026-11-04T18:13:55+08:00",
   "history": [
     {
       "date": "2026-09-22",
@@ -497,6 +497,36 @@
         "- Turnover (mn HKD) · 8,880",
         "- Southbound Turnover (mn HKD) · 4,204 (47.3% of total; net sell: 28 mn)",
         "- Short Selling (% of Volume) · 13.5%"
+      ],
+      "note": null,
+      "alert": null
+    },
+    {
+      "date": "2026-11-03",
+      "lines": [
+        "Tencent 700.HK · Daily Market Data",
+        "2026-11-03 (Tuesday)",
+        "",
+        "- Close (HKD) · 397.2 (+1.3% DoD)",
+        "- Volume (mn shares) · 20.1",
+        "- Turnover (mn HKD) · 8,000",
+        "- Southbound Turnover (mn HKD) · 3,067 (38.3% of total; net buy: 31 mn)",
+        "- Short Selling (% of Volume) · 14.8%"
+      ],
+      "note": null,
+      "alert": null
+    },
+    {
+      "date": "2026-11-04",
+      "lines": [
+        "Tencent 700.HK · Daily Market Data",
+        "2026-11-04 (Wednesday)",
+        "",
+        "- Close (HKD) · 401.6 (+1.1% DoD)",
+        "- Volume (mn shares) · 18.5",
+        "- Turnover (mn HKD) · 7,370",
+        "- Southbound Turnover (mn HKD) · 3,447 (46.8% of total; net buy: 109 mn)",
+        "- Short Selling (% of Volume) · 15.1%"
       ],
       "note": null,
       "alert": null
